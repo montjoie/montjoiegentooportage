@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+DAEMON="/usr/bin/lava-daemon"
+#DAEMON_ARGS="manage  scheduler $LOGFILE $LOGLEVEL"
+NAME=lava-daemon
+PIDFILE=/var/run/lava-server-gunicorn.pid
+
+depend() {
+	use postgresql
+}
+
+start() {
+#	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON
+	/usr/bin/gunicorn -D -u lavaserver -g lavaserver --log-file /var/log/lava-server/gunicorn.log --bind '10.0.0.106:8000' --pid $PIDFILE lava_server.wsgi
+#	/usr/bin/lava-daemon manage scheduler
+	return $?
+}
+
+stop() {
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	return $?
+}
