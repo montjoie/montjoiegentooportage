@@ -2,10 +2,10 @@
 # Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-DAEMON="/usr/bin/gunicorn"
-#DAEMON_ARGS="manage  scheduler $LOGFILE $LOGLEVEL"
-NAME=lava-server-gunicorn
-PIDFILE=/var/run/lava-server-gunicorn.pid
+DAEMON="/usr/bin/lava-server"
+DAEMON_ARGS="manage lava-master $LOGFILE $LOGLEVEL"
+NAME=lava-master
+PIDFILE=/var/run/lava-master.pid
 
 depend() {
 	use postgresql
@@ -13,8 +13,7 @@ depend() {
 
 start() {
 	ebegin "Starting ${SVCNAME}"
-	cd /
-	/usr/bin/gunicorn -D -u lavaserver -g lavaserver --log-file /var/log/lava-server/gunicorn.log --bind '10.0.0.106:8000' --pid $PIDFILE lava_server.wsgi
+	start-stop-daemon --start --quiet --background --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
 	eend $?
 }
 

@@ -24,10 +24,13 @@ PIDFILE=/var/run/lava-slave.pid
 DAEMON_ARGS="--master $MASTER_URL --socket-addr $LOGGER_URL --level $LOGLEVEL $IPV6 $ENCRYPT $MASTER_CERT $SLAVE_CERT $HOSTNAME"
 
 start() {
-	start-stop-daemon --start --pidfile $PIDFILE --name $NAME /usr/bin/lava-slave -- $DAEMON_ARGS
+	ebegin "Starting ${SVCNAME}"
+	start-stop-daemon --start --background --pidfile $PIDFILE --name $NAME /usr/bin/lava-slave -- $DAEMON_ARGS
+	eend $?
 }
 
 stop() {
+	ebegin "Stopping ${SVCNAME}"
 	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
-	return $?
+	eend $?
 }

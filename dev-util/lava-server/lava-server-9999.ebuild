@@ -3,18 +3,17 @@
 
 EAPI=6
 
-#PYTHON_COMPAT=( python2_7 python3_{4,5,6} )
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_{5,6} )
 inherit git-r3 distutils-r1 user
 
 DESCRIPTION="LAVA"
-HOMEPAGE="https://validation.linaro.ort"
+HOMEPAGE="https://validation.linaro.org"
 #SRC_URI=""
-EGIT_REPO_URI="https://github.com/Linaro/lava-server.git"
+EGIT_REPO_URI="https://git.linaro.org/lava/lava.git"
 
-LICENSE="GPL"
+LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="amd64 arm arm64 x86"
 IUSE=""
 
 DEPEND=""
@@ -23,20 +22,16 @@ RDEPEND="${DEPEND}
 	dev-python/django
 	dev-python/django-tables2
 	dev-python/psycopg
-	dev-python/python-daemon
 	dev-python/simplejson
 	dev-python/django-restricted-resource
-	dev-python/json-schema-validator
 	dev-python/python-ldap
 	dev-python/pyyaml[libyaml]
 	dev-python/jinja
 	dev-python/pexpect
 	dev-python/voluptuous
 	dev-python/pyliblzma
-	dev-python/configglue
 	dev-python/pyserial
 	dev-python/netifaces
-	dev-python/twisted
 	dev-python/nose
 	dev-python/pyzmq
 	dev-python/requests
@@ -45,19 +40,22 @@ RDEPEND="${DEPEND}
 	dev-python/pytz
 	dev-python/python-dateutil
 	www-servers/gunicorn"
-#	dev-python/linaro-python-dashboard-bundle
 
 pkg_setup() {
+	python-single-r1_pkg_setup
 	enewgroup lavaserver
 	enewuser lavaserver -1 -1 /var/lib/lava-server/home lavaserver
 }
 
 src_prepare() {
 	rm -r ${S}/google_analytics
-	sed -i 's,.*google_analytics.*,,' lava_server/settings/common.py
-	sed -i 's,.*google_analytics.*,,' lava_server/settings/development.py
-	sed -i 's,.*analytics.*,,' lava_server/templates/layouts/base.html
-	sed -i 's,.*analytics.*,,' lava_server/templates/layouts/base-bootstrap.html
+	sed -i 's,.*google_analytics.*,,' lava_server/settings/common.py || die
+	sed -i 's,.*google_analytics.*,,' lava_server/settings/development.py || die
+	sed -i 's,.*analytics.*,,I' lava_server/settings/common.py || die
+	sed -i 's,.*analytics.*,,' lava_server/templates/layouts/base.html || die
+
+	#validate our cleaning
+	grep -ri analytics lava_server && die
 	default
 }
 
@@ -67,13 +65,13 @@ src_install() {
 	insinto /etc
 	doins -r ${S}/etc/dispatcher-config
 
-	newinitd ${S}/etc/lava-master.init lava-master
-	newinitd ${FILESDIR}/lava-server.init lava-server
+	newinitd ${FILESDIR}/lava-master.init lava-master
+	newinitd ${FILESDIR}/lava-logs.init lava-logs
 	newinitd ${FILESDIR}/lava-server-gunicorn.init lava-server-gunicorn
 
 	dodir /etc/lava-server
 	insinto /etc/lava-server
-	newins instance.template instance.conf
+	newins etc/instance.conf.template instance.conf
 	doins etc/env.yaml
 	doins etc/settings.conf
 
@@ -82,32 +80,32 @@ src_install() {
 	dodir /usr/share/lava-server
 	dodir /usr/share/lava-server/static
 
-	ln -s /usr/lib/python2.7/site-packages/django/contrib/admin/static/admin/ ${D}/usr/share/lava-server/static/admin
-	ln -s /usr/lib/python2.7/site-packages/lava_server/lava-server ${D}/usr/share/lava-server/static/lava-server
-	ln -s /usr/lib/python2.7/site-packages/lava_scheduler_app/static/lava_scheduler_app ${D}/usr/share/lava-server/static/lava_scheduler_app
-	ln -s /usr/lib/python2.7/site-packages/lava_results_app/static/lava_results_app ${D}/usr/share/lava-server/static/lava_results_app
-
 	dodir /etc/lava-server/dispatcher-config/devices
 	dodir /etc/lava-server/dispatcher-config/health-checks
 	insinto /etc/lava-server/dispatcher-config/device-types/
 	doins ${S}/lava_scheduler_app/tests/device-types/*
 
-#	ln -s /usr/lib/python/2.7/lava_server/manage.py lava-server
 	python_foreach_impl distutils-r1_python_install || die
-	#python_foreach_impl newbin ${W}/lib/lava_server/manage.py lava-server
-	EPYTHON=python2.7
-	python_newexe ${S}/lava_server/manage.py lava-server || die
-	python_fix_shebang ${D}/usr/
+	python_foreach_impl python_newexe ${S}/lava_server/manage.py lava-server || die
+	python_foreach_impl python_fix_shebang ${D}/usr/
+
+	# HACK
+	EPYTHON=python3.5
+	ln -s /usr/lib/$EPYTHON/site-packages/django/contrib/admin/static/admin/ ${D}/usr/share/lava-server/static/admin
+	ln -s /usr/lib/$EPYTHON/site-packages/lava_server/static/lava_server ${D}/usr/share/lava-server/static/lava_server
+	ln -s /usr/lib/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app ${D}/usr/share/lava-server/static/lava_scheduler_app
+	ln -s /usr/lib/$EPYTHON/site-packages/lava_results_app/static/lava_results_app ${D}/usr/share/lava-server/static/lava_results_app
 
 	#apache2
 	dodir /etc/apache2/vhosts.d/
 	insinto /etc/apache2/vhosts.d/
 	doins ${S}/etc/lava-server.conf
-	
-	cd ${D}/usr/lib64/python2.7/site-packages/lava_server/lava-server/js/
+
+	#TODO getlibdir	
+	cd ${D}/usr/lib/$EPYTHON/site-packages/lava_server/static/lava_server/js/ || die
 	#ln -s bootstrap-3.3.7.js bootstrap-3.3.7.min.js
 	sh ${FILESDIR}/minify
-	cd ${D}/usr/lib64/python2.7/site-packages/lava_scheduler_app/static/lava_scheduler_app/js
+	cd ${D}/usr/lib/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app/js
 	sh ${FILESDIR}/minify
 
 }

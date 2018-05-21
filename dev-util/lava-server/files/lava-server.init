@@ -3,7 +3,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 DAEMON="/usr/bin/lava-daemon"
-#DAEMON_ARGS="manage  scheduler $LOGFILE $LOGLEVEL"
+DAEMON_ARGS="manage scheduler $LOGFILE $LOGLEVEL"
 NAME=lava-daemon
 PIDFILE=/var/run/lava-server.pid
 
@@ -12,7 +12,7 @@ depend() {
 }
 
 start() {
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
 #	/usr/bin/lava-daemon manage scheduler
 	return $?
 }
