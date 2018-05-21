@@ -19,9 +19,9 @@ fi
 
 LICENSE="GPL"
 SLOT="0"
-IUSE="rngtool"
+IUSE="doc rngtool"
 
-DEPEND="app-text/xmlto"
+DEPEND="doc? ( app-text/xmlto )"
 RDEPEND=""
 
 pkg_setup() {

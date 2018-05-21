@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit autotools linux-info
+inherit autotools epatch linux-info
 
 DESCRIPTION="Linux Kernel Crypto API User Space Interface Library"
 HOMEPAGE="http://www.chronox.de/libkcapi.html"
@@ -13,7 +13,7 @@ then
 	KEYWORDS="amd64 arm arm64 x86"
 else
 	inherit git-r3
-	EGIT_REPO_URI="git://github.com/smuellerDD/libkcapi.git"
+	EGIT_REPO_URI="https://github.com/smuellerDD/libkcapi.git"
 	KEYWORDS=""
 	#S="${WORKDIR}/${PN}"
 fi
