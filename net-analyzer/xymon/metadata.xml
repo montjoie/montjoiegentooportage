@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "http://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+<maintainer>
+<email>clabbe.montjoie@gmail.com</email>
+<name>LABBE Corentin (Montjoie)</name>
+<description>Maintainer.</description>
+</maintainer>
+<use>
+<flag name="fping">Use fping instead of the internal xymon ping</flag>
+<flag name="server">Install also the xymon server</flag>
+</use>
+<longdescription lang="en">
+</longdescription>
+</pkgmetadata>
+

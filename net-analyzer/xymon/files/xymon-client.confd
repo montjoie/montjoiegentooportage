@@ -1,0 +1,2 @@
+options=""
+XYMON_CLIENT_TMPDIR="/var/tmp/xymon-client/"

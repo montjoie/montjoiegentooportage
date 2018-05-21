@@ -1,0 +1,71 @@
+#!/sbin/openrc-run
+# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/sys-power/acpid/files/acpid-2.0.11-init.d,v 1.6 2011/08/05 08:47:40 ssuominen Exp $
+
+extra_commands="reload"
+command="/usr/xymon/client/runclient.sh"
+#start_stop_daemon_args="--quiet"
+start_stop_daemon_args=""
+description="Daemon for xymon client"
+: ${NAME:="xymon client"}
+. /etc/conf.d/xymon-client
+
+depend() {
+	need localmount net
+	use logger
+}
+
+if [ "${RC_VERSION:-0}" = "0" ]; then
+	start() {
+		eerror "This script cannot be used for baselayout-1."
+		return 1
+	}
+fi
+
+reload() {
+	ebegin "Reloading $NAME configuration"
+		start-stop-daemon --user xymon:xymon $start_stop_daemon_args --exec $command -- reload
+	eend $?
+}
+
+start() {
+	ebegin "Starting $NAME"
+		if [ -z "$XYMON_CLIENT_TMPDIR" ];then
+			ewarn "XYMON_CLIENT_TMPDIR is empty"
+		else
+			if [ ! -e $XYMON_CLIENT_TMPDIR ];then
+				mkdir -p $XYMON_CLIENT_TMPDIR
+				chown xymon:xymon $XYMON_CLIENT_TMPDIR
+				chmod 750 $XYMON_CLIENT_TMPDIR
+				CURRENT_TMP="`readlink /usr/xymon/client/tmp`"
+				if [ "$CURRENT_TMP" != "$XYMON_CLIENT_TMPDIR" ];then
+					ewarn "Xymon client tmpdir does not match"
+					ewarn "Current=$CURRENT_TMP XYMON_CLIENT_TMPDIR=$XYMON_CLIENT_TMPDIR"
+				fi
+			fi
+		fi
+		start-stop-daemon --user xymon:xymon --start $start_stop_daemon_args --exec $command -- start $options
+	eend $?
+}
+stop() {
+	ebegin "Stopping $NAME"
+		#kill le vmstat
+		for pid in `ps aux |grep ^xymon |grep vmstat |grep -v grep |sed 's/[[:space:]][[:space:]]*/ /g' | cut -d\  -f2`
+		do
+			einfo "kill xymon $pid"
+			kill $pid
+		done
+#		start-stop-daemon --user xymon:xymon --stop $start_stop_daemon_args --exec $command -- stop
+		su - xymon -s /bin/bash -c "$command stop"
+		RET=$?
+		if [ $RET -eq 0 ];then
+			rm -f /var/log/xymon-client/clientlaunch.`uname`.pid
+		fi
+	eend $RET
+}
+status() {
+	ebegin "Status of $NAME"
+		start-stop-daemon --user xymon:xymon $start_stop_daemon_args --exec $command -- status
+	eend $?
+}

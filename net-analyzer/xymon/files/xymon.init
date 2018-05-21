@@ -1,0 +1,107 @@
+#!/sbin/openrc-run
+# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/sys-power/acpid/files/acpid-2.0.11-init.d,v 1.6 2011/08/05 08:47:40 ssuominen Exp $
+
+extra_commands="reload"
+command="/usr/xymon/server/xymon.sh"
+#start_stop_daemon_args="--quiet"
+start_stop_daemon_args=""
+description="Daemon for xymon"
+daemon="/usr/xymon/server/bin/xymonlaunch"
+: ${NAME:="xymon"}
+PIDDIR='/run/xymond/'
+PIDFILE="$PIDDIR/xymonlaunch.pid"
+
+depend() {
+	need localmount xymon-client
+	use logger
+}
+
+if [ "${RC_VERSION:-0}" = "0" ]; then
+	start() {
+		eerror "This script cannot be used for baselayout-1."
+		return 1
+	}
+fi
+
+reload() {
+	local ret
+	ebegin "Reloading $NAME configuration"
+		#start-stop-daemon --user xymon:xymon $start_stop_daemon_args --exec $command -- reload
+		#start-stop-daemon --user xymon:xymon $start_stop_daemon_args --exec $daemon -- reload
+		if [ -e $PIDFILE ];then
+			einfo "Reloading $NAME"
+			kill --signal HUP `cat $PIDDIR/xymond.pid`
+			ret=$?
+		else
+			eerror "$NAME is not running"
+			ret=1
+		fi
+	eend $ret
+}
+
+start() {
+	ebegin "Starting $NAME"
+		mkdir -p $PIDDIR
+		chown xymon:xymon $PIDDIR
+		#start-stop-daemon --user xymon:xymon --start $start_stop_daemon_args --exec $command -- start
+		start-stop-daemon --user xymon:xymon --exec $daemon --start \
+			-- \
+			--config=/etc/xymon/tasks.cfg \
+			--env=/etc/xymon/xymonserver.cfg \
+			--log=/var/log/xymon/xymonlaunch.cfg \
+			--pidfile=$PIDFILE
+	eend $?
+}
+stop() {
+	ebegin "Stopping $NAME"
+		start-stop-daemon --user xymon:xymon --stop $start_stop_daemon_args --exec $daemon --pidfile $PIDFILE -- stop
+		if [ $? -ne 0 ];then
+			eerror "Got some errors when stopping xymon"
+		fi
+		#kill le vmstat
+		pgrep --uid xymon vmstat
+		if [ $? -eq 0 ];then
+			einfo "kill remaining xymon vmstat"
+			killall --user xymon vmstat
+		fi
+
+		pgrep --uid xymon xymonlaunch > /dev/null
+		if [ $? -eq 0 ];then
+			einfo "kill remaining xymonlaunch"
+			killall --user xymon /usr/xymon/client/bin/xymonlaunch
+		fi
+                #start-stop-daemon --user xymon:xymon --stop $start_stop_daemon_args --exec $command -- stop
+		#su - xymon -s /bin/bash -c "$command stop"
+	eend $?
+}
+status() {
+	ebegin "Status of $NAME"
+	local ret
+	ret=0
+	if [ -e $PIDFILE ];then
+		kill -0 `cat $PIDFILE`
+		if [ $? -eq 0 ];then
+			einfo "$NAME (xymonlaunch) running"
+		else
+			einfo "$NAME (xymonlaunch) not running, but stale pid exists"
+		fi
+	else
+		einfo "$NAME (xymonlaunch) is not running"
+		ret=1
+	fi
+	if [ -e $PIDDIR/xymond.pid ];then
+		kill -0 `cat $PIDDIR/xymond.pid`
+		if [ $? -eq 0 ];then
+			einfo "$NAME (xymond) running"
+		else
+			einfo "$NAME (xymond) not running, but stale pid exists"
+		fi
+	else
+		einfo "$NAME (xymond) is not running"
+		ret=1
+	fi
+#		start-stop-daemon --user xymon:xymon $start_stop_daemon_args --exec $command -- status
+	eend $ret
+}
