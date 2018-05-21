@@ -3,7 +3,7 @@
 
 EAPI=6
 
-PYTHON_COMPAT=( python2_7 )
+PYTHON_COMPAT=( python3_5 )
 inherit distutils-r1
 
 DESCRIPTION="lava-tool"
@@ -12,7 +12,7 @@ SRC_URI="https://git.linaro.org/lava/lava-tool.git/snapshot/lava-tool-release-0.
 
 LICENSE=""
 SLOT="0"
-KEYWORDS="amd64 ~x86"
+KEYWORDS="amd64 arm arm64 x86"
 IUSE=""
 S="${WORKDIR}/$PN-release-${PV}"
 
