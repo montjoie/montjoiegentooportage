@@ -16,6 +16,7 @@
 		<flag name="lmdb">Use <pkg>dev-db/lmdb</pkg> as database backend</flag>
 		<flag name="qdbm">Use <pkg>dev-db/qdbm</pkg> as database backend</flag>
 		<flag name="tests">Install test files</flag>
+		<flag name="yaml">Support read YAML files</flag>
 		<flag name="tokyocabinet">Use <pkg>dev-db/tokyocabinet</pkg> as database backend</flag>
 	</use>
 	<longdescription>
