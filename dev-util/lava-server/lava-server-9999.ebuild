@@ -45,7 +45,7 @@ RDEPEND="${DEPEND}
 		dev-embedded/u-boot-tools
 		net-ftp/tftp-hpa
 	qemu? (
-		app-emulation/libvirt[${PYTHON_USEDEP}
+		app-emulation/libvirt[${PYTHON_USEDEP}]
 		app-emulation/supermin
 		)
 	dev-python/configobj[${PYTHON_USEDEP}]
