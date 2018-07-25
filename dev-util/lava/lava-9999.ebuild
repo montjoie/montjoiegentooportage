@@ -25,7 +25,7 @@ DEPEND=""
 RDEPEND="${DEPEND}
 	server? ( dev-db/postgresql )
 	server? (
-		dev-python/django[${PYTHON_USEDEP}]
+		>=dev-python/django-1.10[${PYTHON_USEDEP}]
 		dev-python/django-tables2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
@@ -45,11 +45,11 @@ RDEPEND="${DEPEND}
 	dev-python/pytz[${PYTHON_USEDEP}]
 	dev-python/python-dateutil[${PYTHON_USEDEP}]
 	dispatcher? (
-		app-emulation/libguestfs[${PYTHON_USEDEP}]
+		app-emulation/libguestfs[python]
 		dev-embedded/u-boot-tools
 		net-ftp/tftp-hpa
 	qemu? (
-		app-emulation/libvirt[${PYTHON_USEDEP}]
+		app-emulation/libvirt
 		app-emulation/supermin
 		)
 	dev-python/configobj[${PYTHON_USEDEP}]
