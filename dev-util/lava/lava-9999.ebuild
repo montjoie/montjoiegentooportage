@@ -9,12 +9,16 @@ inherit git-r3 distutils-r1 user
 
 DESCRIPTION="LAVA"
 HOMEPAGE="https://validation.linaro.org"
-#SRC_URI=""
-EGIT_REPO_URI="https://git.linaro.org/lava/lava.git"
+
+if [[ "${PV}" != "9999" ]]; then
+	SRC_URI="https://git.linaro.org/lava/lava.git/snapshot/lava-${PV}.tar.gz"
+	KEYWORDS="amd64 arm arm64 x86"
+else
+	EGIT_REPO_URI="https://git.linaro.org/lava/lava.git"
+fi
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm arm64 x86"
 IUSE="dispatcher ldap qemu server"
 
 DEPEND=""

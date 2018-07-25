@@ -1,0 +1,27 @@
+#!/sbin/openrc-run
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+NAME=lava-logs
+PIDFILE=/var/run/lava-logs.pid
+LOGLEVEL=DEBUG
+[ -r /etc/lava-server/$NAME ] && . /etc/lava-server/$NAME
+
+DAEMON="/usr/bin/lava-server"
+DAEMON_ARGS="manage lava-logs --level $LOGLEVEL $SOCKET $MASTER_SOCKET $IPV6 $ENCRYPT $MASTER_CERT $SLAVES_CERTS"
+
+depend() {
+	use postgresql
+}
+
+start() {
+	ebegin "Starting ${SVCNAME}"
+	start-stop-daemon --start --quiet --background --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_ARGS
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping ${SVCNAME}"
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	eend $?
+}
