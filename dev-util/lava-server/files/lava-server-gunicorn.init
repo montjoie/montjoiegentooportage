@@ -14,7 +14,7 @@ depend() {
 start() {
 	ebegin "Starting ${SVCNAME}"
 	cd /
-	/usr/bin/gunicorn -D -u lavaserver -g lavaserver --log-file /var/log/lava-server/gunicorn.log --bind '10.0.0.106:8000' --pid $PIDFILE lava_server.wsgi
+	/usr/bin/gunicorn -D -u lavaserver -g lavaserver --log-file /var/log/lava-server/gunicorn.log --bind '127.0.0.1:8000' --pid $PIDFILE lava_server.wsgi
 	eend $?
 }
 

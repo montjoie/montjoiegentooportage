@@ -1,0 +1,14 @@
+--- a/setup.py.old	2018-05-23 12:00:06.000000000 +0200
++++ b/setup.py	2018-05-23 12:00:18.000000000 +0200
+@@ -61,11 +61,5 @@
+         "pyzmq",
+         "requests",
+     ],
+-    setup_requires=[
+-        'pytest-runner',
+-    ],
+-    tests_require=[
+-        'pytest',
+-    ],
+     zip_safe=True
+ )
