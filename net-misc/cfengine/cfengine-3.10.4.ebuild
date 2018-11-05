@@ -18,7 +18,7 @@ LICENSE="GPL-3"
 SLOT="3"
 KEYWORDS="amd64 arm arm64 ~ppc ~sparc x86"
 
-IUSE="acl examples html libvirt lmdb mysql postgres +qdbm selinux tests tokyocabinet vim-syntax xml"
+IUSE="acl curl examples html libvirt lmdb mysql postgres +qdbm selinux tests tokyocabinet vim-syntax yaml xml"
 
 DEPEND="
 	mysql? ( virtual/mysql )
@@ -30,6 +30,7 @@ DEPEND="
 	libvirt? ( app-emulation/libvirt )
 	dev-libs/openssl:*
 	dev-libs/libpcre
+	yaml? ( dev-libs/libyaml )
 	xml? ( dev-libs/libxml2 )
 	acl? ( virtual/acl )"
 RDEPEND="${DEPEND}"
@@ -56,12 +57,14 @@ src_configure() {
 		--with-workdir=/var/cfengine \
 		--with-pcre \
 		$(use_with acl libacl) \
+		$(use_with !curl libcurl no) \
 		$(use_with qdbm) \
 		$(use_with lmdb) \
 		$(use_with tokyocabinet) \
 		$(use_with postgres postgresql) \
 		$(use_with mysql mysql check) \
 		$(use_with libvirt) \
+		$(use_with yaml libyaml) \
 		$(use_with xml libxml2)
 }
 
