@@ -39,6 +39,7 @@ src_prepare() {
 	cp "${S}"/web/showgraph.c "${S}"/web/showgraph.c.orig || die
 	cp "${S}/web/history.c" "${S}/web/history.c.orig" || die
 	epatch "${FILESDIR}"/history.patch || die
+	epatch "${FILESDIR}"/logfetch.patch || die
 #	find -name *.c | xargs sed -i 's,static char rcsid,static const char rcsid,' || die
 	if ! use ldap ; then
 		rm build/test-ldap.c || die

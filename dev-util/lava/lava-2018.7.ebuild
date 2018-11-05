@@ -20,7 +20,7 @@ fi
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="dispatcher ldap qemu server"
+IUSE="dispatcher ldap nbd nfs qemu server"
 
 DEPEND=""
 RDEPEND="${DEPEND}
@@ -31,6 +31,7 @@ RDEPEND="${DEPEND}
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
 	)
+	nbd? { sys-block/nbd }
 	dev-python/psycopg[${PYTHON_USEDEP}]
 	dev-python/simplejson[${PYTHON_USEDEP}]
 	dev-python/pyyaml[libyaml]
