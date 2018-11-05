@@ -1,0 +1,11 @@
+--- client/logfetch.c.old	2018-09-25 12:04:21.000000000 +0200
++++ client/logfetch.c	2018-09-25 12:20:38.000000000 +0200
+@@ -21,6 +21,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <time.h>
+ #include <limits.h>
+ #include <errno.h>
+
