@@ -19,9 +19,11 @@ else
 	EGIT_REPO_URI="https://git.linaro.org/lava/lava.git"
 fi
 
+#TODO feature check for NFS LXC
+
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="dispatcher ldap nbd nfs qemu master screen telnet xnbd"
+IUSE="dispatcher ldap lxc nbd nfs qemu master screen telnet xnbd"
 
 DEPEND=""
 RDEPEND="${DEPEND}
