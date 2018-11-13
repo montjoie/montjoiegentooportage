@@ -5,7 +5,7 @@ EAPI=6
 
 PYTHON_REQ_USE="sqlite"
 PYTHON_COMPAT=( python3_6 )
-inherit distutils-r1 user
+inherit autotools distutils-r1 user
 
 DESCRIPTION="LAVA"
 HOMEPAGE="https://validation.linaro.org"
@@ -23,7 +23,7 @@ fi
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="dispatcher ldap lxc nbd nfs qemu master screen telnet xnbd"
+IUSE="apache2 dispatcher ldap lxc nbd nfs qemu master screen telnet xnbd"
 
 DEPEND=""
 RDEPEND="${DEPEND}
@@ -34,6 +34,8 @@ RDEPEND="${DEPEND}
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
 	)
+	ldap? ( dev-python/django-auth-ldap )
+	apache2? ( www-servers/apache )
 	nbd? ( sys-block/nbd )
 	nfs? ( net-fs/nfs-utils )
 	screen? ( app-misc/screen )
@@ -81,6 +83,8 @@ src_prepare() {
 
 	#validate our cleaning
 	grep -ri analytics lava_server && die
+
+	eapply "${FILESDIR}"/version.patch
 	default
 }
 
@@ -125,27 +129,29 @@ src_install() {
 	if use master;then
 	# HACK
 	EPYTHON=python3.6
-	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/django/contrib/admin/static/admin/ ${D}/usr/share/lava-server/static/admin
-	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/lava_server/static/lava_server ${D}/usr/share/lava-server/static/lava_server
-	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app ${D}/usr/share/lava-server/static/lava_scheduler_app
-	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/lava_results_app/static/lava_results_app ${D}/usr/share/lava-server/static/lava_results_app
+	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/django/contrib/admin/static/admin/ ${D}/usr/share/lava-server/static/admin || die
+	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/lava_server/static/lava_server ${D}/usr/share/lava-server/static/lava_server || die
+	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app ${D}/usr/share/lava-server/static/lava_scheduler_app || die
+	ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/lava_results_app/static/lava_results_app ${D}/usr/share/lava-server/static/lava_results_app || die
 
 	if ! use ldap;then
-		sed -i 's,import ldap,,' /usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/utils.py
+		sed -i 's,import ldap,,' ${D}/usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/utils.py
 	fi
 
 	#apache2
-	dodir /etc/apache2/vhosts.d/
-	insinto /etc/apache2/vhosts.d/
-	doins ${S}/etc/lava-server.conf
+	if use apache2; then
+		dodir /etc/apache2/vhosts.d/
+		insinto /etc/apache2/vhosts.d/
+		doins ${S}/etc/lava-server.conf
+	fi
 
 	cd ${D}/usr/$(get_libdir)/$EPYTHON/site-packages/lava_server/static/lava_server/js/ || die
-	#ln -s bootstrap-3.3.7.js bootstrap-3.3.7.min.js
 	sh ${FILESDIR}/minify
 	cd ${D}/usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app/js
 	sh ${FILESDIR}/minify
 
 	dodir /var/lib/lava-server/default/
+	dodir /var/lib/lava-server/default/media/
 	fowners -R lavaserver:lavaserver /var/lib/lava-server/default/
 	else
 		einfo "Clean unused master files"

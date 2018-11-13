@@ -3,5 +3,6 @@ find | grep -v min.js |
 while read line
 do
 	MINJS=$(echo $line | sed 's,js$,min.js,')
+	echo "Minify $line $MINJS"
 	ln -s $line $MINJS
 done
