@@ -29,7 +29,7 @@ DEPEND=""
 RDEPEND="${DEPEND}
 	master? ( dev-db/postgresql )
 	master? (
-		>=dev-python/django-1.10[${PYTHON_USEDEP}]
+		<dev-python/django-2[${PYTHON_USEDEP}]
 		dev-python/django-tables2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
