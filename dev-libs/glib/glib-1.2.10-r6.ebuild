@@ -70,6 +70,7 @@ multilib_src_install() {
 	gnome2_src_install
 
 	chmod 755 "${ED}"/usr/$(get_libdir)/libgmodule-1.2.so.* || die
+	sed -i 's,define G_INLINE_FUNC extern inline,define G_INLINE_FUNC inline,' "${ED}"/usr/include/glib-1.2/glib.h
 }
 
 multilib_src_install_all() {
