@@ -1,0 +1,11 @@
+--- saplib/sapEngine.cpp.orig	2011-06-17 14:43:46.000000000 +0200
++++ saplib/sapEngine.cpp	2011-06-17 14:43:50.000000000 +0200
+@@ -116,7 +116,7 @@
+ 					if( i==0 )
+ 						continue;
+ 					inputBuffer[i++] = 0;
+-					char *codes[]={ "PLAYER", "MUSIC", "INIT", "TYPE", "SONGS", "DEFSONG", "FASTPLAY", "STEREO", "TIME", NULL };
++					const char *codes[]={ "PLAYER", "MUSIC", "INIT", "TYPE", "SONGS", "DEFSONG", "FASTPLAY", "STEREO", "TIME", NULL };
+ 					int j,k,a;
+ 					for( j=0;; j++ )
+ 					{

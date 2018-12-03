@@ -1,0 +1,14 @@
+--- Makefile.orig	2011-06-17 15:11:49.000000000 +0200
++++ Makefile	2011-06-17 15:12:19.000000000 +0200
+@@ -21,10 +21,7 @@
+ 
+ CC     = gcc 
+ 
+-CFLAGS = -O2 -Wall -fPIC -fpic \
+-	-finline-functions -ffast-math \
+-	-funroll-all-loops -fomit-frame-pointer -fno-strength-reduce \
+-	$(shell xmms-config --cflags) 
++#CFLAGS=${CFLAGS} $(shell xmms-config --cflags) 
+ 
+ LINKER_FLAGS = -shared -Wl,-soname -Wl,$(TARGET) \
+ 	-Wl,-retain-symbols-file -Wl,syms

@@ -1,0 +1,21 @@
+--- saplib/pokeyNamespace.h.orig	2011-06-17 15:09:20.000000000 +0200
++++ saplib/pokeyNamespace.h	2011-06-17 15:10:43.000000000 +0200
+@@ -23,12 +23,12 @@
+ 		{\
+ 			ss += samplerRateOver;\
+ 			DWORD pomd; int pomi;\
+-			pomd  = ((DWORD*)&switch_J3_Q_state[0])[0];\
+-			pomd &= ((DWORD*)&switch_J3_Q_stateAND[0])[0];\
+-			pomd ^= ((DWORD*)&signal_state_out[0])[0];\
+-			pomd &= ((DWORD*)&freq_sequre[0])[0];\
+-			pomd |= ((DWORD*)&audioControl_Latch_Digi[0])[0];\
+-			pomd &= ((DWORD*)&audioControl_Latch2[0])[0];\
++			pomd  = switch_J3_Q_state[0];\
++			pomd &= switch_J3_Q_stateAND[0];\
++			pomd ^= signal_state_out[0];\
++			pomd &= freq_sequre[0];\
++			pomd |= audioControl_Latch_Digi[0];\
++			pomd &= audioControl_Latch2[0];\
+ 			pomd = pomd + (pomd>>16);\
+ 			pomi = (int)( pomd + (pomd>>8) ) & 255;\
+ 			oldValI = oldValI + ((cutFreq2i*((pomi<<12) - oldValI))>>12);\

@@ -1,0 +1,98 @@
+--- saplib/sapCpu.cpp.orig	2011-06-17 15:05:41.000000000 +0200
++++ saplib/sapCpu.cpp	2011-06-17 15:07:51.000000000 +0200
+@@ -183,37 +183,37 @@
+ #define Load_ZP(a)		BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1];															cB = atariMem[cA];	cpuReg_PC+=2; a; }
+ #define Load_ZPX(a)		BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1]+cpuReg_X;													cB = atariMem[cA];	cpuReg_PC+=2; a; }
+ #define Load_ZPY(a)		BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1]+cpuReg_Y;													cB = atariMem[cA];	cpuReg_PC+=2; a; }
+-#define Load_ABS(a)		BYTE cB; { WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0];											cB = freddieReadByte(cWA); cpuReg_PC+=3; a; }
+-#define Load_ABSX(a)	BYTE cB; { WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_X;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; }
+-#define Load_ABSY(a)	BYTE cB; { WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_Y;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; }
+-#define Load_PreX(a)	BYTE cB; { BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = ((WORD*)&atariMem[cA])[0];		cB = freddieReadByte(cWA); cpuReg_PC+=2; a; }
+-#define Load_PostY(a)	BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = ((WORD*)&atariMem[cA])[0] + (WORD)cpuReg_Y;	cB = freddieReadByte(cWA); cpuReg_PC+=2; a; }
++#define Load_ABS(a)		BYTE cB; { WORD cWA = atariMem[cpuReg_PC+1];											cB = freddieReadByte(cWA); cpuReg_PC+=3; a; }
++#define Load_ABSX(a)	BYTE cB; { WORD cWA = atariMem[cpuReg_PC+1] + (WORD)cpuReg_X;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; }
++#define Load_ABSY(a)	BYTE cB; { WORD cWA = atariMem[cpuReg_PC+1] + (WORD)cpuReg_Y;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; }
++#define Load_PreX(a)	BYTE cB; { BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = atariMem[cA];		cB = freddieReadByte(cWA); cpuReg_PC+=2; a; }
++#define Load_PostY(a)	BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = atariMem[cA] + (WORD)cpuReg_Y;	cB = freddieReadByte(cWA); cpuReg_PC+=2; a; }
+ 
+ #define LoadReg_IMD(a)		{																							a = cpuFlag_N = cpuFlag_Z = atariMem[cpuReg_PC+1]; cpuReg_PC+=2; }
+ #define LoadReg_ZP(a)		{ BYTE cA=atariMem[cpuReg_PC+1];															a = cpuFlag_N = cpuFlag_Z = atariMem[cA];	cpuReg_PC+=2; }
+ #define LoadReg_ZPX(a)		{ BYTE cA=atariMem[cpuReg_PC+1]+cpuReg_X;													a = cpuFlag_N = cpuFlag_Z = atariMem[cA];	cpuReg_PC+=2; }
+ #define LoadReg_ZPY(a)		{ BYTE cA=atariMem[cpuReg_PC+1]+cpuReg_Y;													a = cpuFlag_N = cpuFlag_Z = atariMem[cA];	cpuReg_PC+=2; }
+-#define LoadReg_ABS(a)		{ WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0];											a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=3; }
+-#define LoadReg_ABSX(a)		{ WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_X;							a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=3; }
+-#define LoadReg_ABSY(a)		{ WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_Y;							a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=3; }
+-#define LoadReg_PreX(a)		{ BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = ((WORD*)&atariMem[cA])[0];		a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=2; }
+-#define LoadReg_PostY(a)	{ BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = ((WORD*)&atariMem[cA])[0] + (WORD)cpuReg_Y;		a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=2; }
++#define LoadReg_ABS(a)		{ WORD cWA = atariMem[cpuReg_PC+1];											a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=3; }
++#define LoadReg_ABSX(a)		{ WORD cWA = atariMem[cpuReg_PC+1] + (WORD)cpuReg_X;							a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=3; }
++#define LoadReg_ABSY(a)		{ WORD cWA = atariMem[cpuReg_PC+1] + (WORD)cpuReg_Y;							a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=3; }
++#define LoadReg_PreX(a)		{ BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = atariMem[cA];		a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=2; }
++#define LoadReg_PostY(a)	{ BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = atariMem[cA] + (WORD)cpuReg_Y;		a = cpuFlag_N = cpuFlag_Z = freddieReadByte(cWA); cpuReg_PC+=2; }
+ 
+ #define Modify_ZP(a)	BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1];															cB = atariMem[cA];	cpuReg_PC+=2; a; atariMem[cA] = cB; }
+ #define Modify_ZPX(a)	BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1]+cpuReg_X;													cB = atariMem[cA];	cpuReg_PC+=2; a; atariMem[cA] = cB; }
+-#define Modify_ABS(a)	BYTE cB; { WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0];											cB = freddieReadByte(cWA); cpuReg_PC+=3; a; FREDDIEWRITEBYTE(cWA,cB); }
+-#define Modify_ABSX(a)	BYTE cB; { WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_X;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; FREDDIEWRITEBYTE(cWA,cB); }
+-#define Modify_ABSY(a)	BYTE cB; { WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_Y;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; FREDDIEWRITEBYTE(cWA,cB); }
+-#define Modify_PreX(a)	BYTE cB; { BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = ((WORD*)&atariMem[cA])[0];		cB = freddieReadByte(cWA); cpuReg_PC+=2; a; FREDDIEWRITEBYTE(cWA,cB); }
+-#define Modify_PostY(a)	BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = ((WORD*)&atariMem[cA])[0] + (WORD)cpuReg_Y;	cB = freddieReadByte(cWA); cpuReg_PC+=2; a; FREDDIEWRITEBYTE(cWA,cB); }
++#define Modify_ABS(a)	BYTE cB; { WORD cWA = atariMem[cpuReg_PC+1];											cB = freddieReadByte(cWA); cpuReg_PC+=3; a; FREDDIEWRITEBYTE(cWA,cB); }
++#define Modify_ABSX(a)	BYTE cB; { WORD cWA = atariMem[cpuReg_PC + 1] + (WORD)cpuReg_X;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; FREDDIEWRITEBYTE(cWA,cB); }
++#define Modify_ABSY(a)	BYTE cB; { WORD cWA = atariMem[cpuReg_PC+1] + (WORD)cpuReg_Y;							cB = freddieReadByte(cWA); cpuReg_PC+=3; a; FREDDIEWRITEBYTE(cWA,cB); }
++#define Modify_PreX(a)	BYTE cB; { BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = atariMem[cA];		cB = freddieReadByte(cWA); cpuReg_PC+=2; a; FREDDIEWRITEBYTE(cWA,cB); }
++#define Modify_PostY(a)	BYTE cB; { BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = atariMem[cA] + (WORD)cpuReg_Y;	cB = freddieReadByte(cWA); cpuReg_PC+=2; a; FREDDIEWRITEBYTE(cWA,cB); }
+ 
+ #define Store_ZP(a)		{ BYTE cA=atariMem[cpuReg_PC+1];															cpuReg_PC+=2;	atariMem[cA] = a; }
+ #define Store_ZPX(a)	{ BYTE cA=atariMem[cpuReg_PC+1]+cpuReg_X;													cpuReg_PC+=2;	atariMem[cA] = a; }
+-#define Store_ABS(a)	{ WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0];											cpuReg_PC+=3;	FREDDIEWRITEBYTE(cWA,a); }
+-#define Store_ABSX(a)	{ WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_X;							cpuReg_PC+=3;	FREDDIEWRITEBYTE(cWA,a); }
+-#define Store_ABSY(a)	{ WORD cWA = ((WORD*)&atariMem[cpuReg_PC+1])[0] + (WORD)cpuReg_Y;							cpuReg_PC+=3;	FREDDIEWRITEBYTE(cWA,a); }
+-#define Store_PreX(a)	{ BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = ((WORD*)&atariMem[cA])[0];		cpuReg_PC+=2;	FREDDIEWRITEBYTE(cWA,a); }
+-#define Store_PostY(a)	{ BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = ((WORD*)&atariMem[cA])[0] + (WORD)cpuReg_Y;		cpuReg_PC+=2;	FREDDIEWRITEBYTE(cWA,a); }
++#define Store_ABS(a)	{ WORD cWA = atariMem[cpuReg_PC+1];											cpuReg_PC+=3;	FREDDIEWRITEBYTE(cWA,a); }
++#define Store_ABSX(a)	{ WORD cWA = atariMem[cpuReg_PC+1] + (WORD)cpuReg_X;							cpuReg_PC+=3;	FREDDIEWRITEBYTE(cWA,a); }
++#define Store_ABSY(a)	{ WORD cWA = atariMem[cpuReg_PC+1] + (WORD)cpuReg_Y;							cpuReg_PC+=3;	FREDDIEWRITEBYTE(cWA,a); }
++#define Store_PreX(a)	{ BYTE cA=(atariMem[cpuReg_PC+1]+cpuReg_X)&255; WORD cWA = atariMem[cA];		cpuReg_PC+=2;	FREDDIEWRITEBYTE(cWA,a); }
++#define Store_PostY(a)	{ BYTE cA=atariMem[cpuReg_PC+1]; WORD cWA = atariMem[cA] + (WORD)cpuReg_Y;		cpuReg_PC+=2;	FREDDIEWRITEBYTE(cWA,a); }
+ 
+ int opcode_0x00(bool &holded)	/* 0x00 - BRK				7 cycles	*/
+ {
+@@ -382,7 +382,7 @@
+ 	cpuReg_PC+=2;
+ 	atariMem[0x100 + cpuReg_S] = (cpuReg_PC>>8)&0xFF; cpuReg_S--;
+ 	atariMem[0x100 + cpuReg_S] = cpuReg_PC&0xFF; cpuReg_S--;
+-	cpuReg_PC = ((WORD*)&atariMem[cpuReg_PC-1])[0];
++	cpuReg_PC = atariMem[cpuReg_PC-1];
+ 	return 6;
+ }
+ int opcode_0x21(bool &holded)	/* 0x21 - AND (,X)			6 cycles	*/
+@@ -449,7 +449,7 @@
+ int opcode_0x2C(bool &holded)	/* 0x2C - BIT ABS			4 cycles	*/
+ {
+ BYTE cb;
+-	cb = atariMem[((WORD*)&atariMem[cpuReg_PC+1])[0]];
++	cb = atariMem[atariMem[cpuReg_PC+1]];
+ 	cpuFlag_Z = cb&cpuReg_A; cpuFlag_N = cb; cpuFlag_V = cb>>6;
+ 	cpuReg_PC+=3;
+ 	return 4;
+@@ -617,7 +617,7 @@
+ }
+ int opcode_0x4C(bool &holded)	/* 0x4C - JMP				3 cycles	*/
+ {
+-	cpuReg_PC = ((WORD*)&atariMem[cpuReg_PC+1])[0];
++	cpuReg_PC = atariMem[cpuReg_PC+1];
+ 	return 3;
+ }
+ int opcode_0x4D(bool &holded)	/* 0x4D - EOR ABS			4 cycles	*/
+@@ -783,8 +783,8 @@
+ }
+ int opcode_0x6C(bool &holded)	/* 0x6C - JMP ( )			6 cycles	*/
+ {
+-	WORD wA = ((WORD*)&atariMem[cpuReg_PC+1])[0];
+-	wA = ((WORD*)&atariMem[wA])[0];
++	WORD wA = atariMem[cpuReg_PC+1];
++	wA = atariMem[wA];
+ 	cpuReg_PC = wA;
+ 	return 6;
+ }
