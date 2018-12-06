@@ -60,7 +60,7 @@ RDEPEND="${DEPEND}
 		dev-embedded/u-boot-tools
 		net-ftp/tftp-hpa
 	qemu? (
-		app-emulation/libvirt
+		app-emulation/libguestfs
 		app-emulation/supermin
 		)
 	dev-python/configobj[${PYTHON_USEDEP}]
@@ -153,6 +153,7 @@ src_install() {
 	dodir /var/lib/lava-server/default/
 	dodir /var/lib/lava-server/default/media/
 	fowners -R lavaserver:lavaserver /var/lib/lava-server/default/
+	dobin ${FILESDIR}/lava-postinstall
 	else
 		einfo "Clean unused master files"
 		EPYTHON=python3.6
@@ -169,5 +170,7 @@ src_install() {
 
 pkg_postinst() {
 	einfo 'Please set INTFTPD_PATH="/var/lib/lava/dispatcher/tmp/"'
+	einfo "Create an admin account with lava-server manage users add --passwd adminpassword --staff --superuser admin"
 	einfo "if you upgrade LAVA, please run lava-server manage migrate (see share/postinst.py TODO)"
+	einfo "TODO use postinst for database init"
 }
