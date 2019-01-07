@@ -1,0 +1,10 @@
+--- lava-2018.10/version.py.old	2018-11-13 12:39:02.970160334 -0000
++++ lava-2018.10/version.py	2018-11-13 12:38:35.354158733 -0000
+@@ -49,6 +49,7 @@
+             d = m.groupdict()
+             return "%s-%04d-g%s" % (d["tag"], int(d["commits"]), d["hash"])
+     if os.path.exists('debian/changelog'):
++        return '2018.10'
+         return subprocess.check_output(('dpkg-parsechangelog', '--show-field',  # nosec - internal
+                                         'Version')).strip().decode('utf-8').split('-')[0]
+ 
