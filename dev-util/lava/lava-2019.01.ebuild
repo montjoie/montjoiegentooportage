@@ -22,7 +22,7 @@ fi
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="apache2 dispatcher ldap lxc nbd nfs qemu master screen telnet tftp xnbd"
+IUSE="apache2 dispatcher doc ldap lxc nbd nfs qemu master screen telnet tftp xnbd"
 
 DEPEND=""
 RDEPEND="${DEPEND}
@@ -57,6 +57,10 @@ RDEPEND="${DEPEND}
 	dev-util/lava-tool
 	dev-python/pytz[${PYTHON_USEDEP}]
 	dev-python/python-dateutil[${PYTHON_USEDEP}]
+	doc? (
+		dev-python/sphinx
+		dev-python/sphinx-bootstrap-theme
+	)
 	dispatcher? (
 		app-emulation/libguestfs[python]
 		dev-embedded/u-boot-tools
@@ -97,6 +101,12 @@ pkg_setup() {
 src_prepare() {
 	eapply "${FILESDIR}"/version-${PV}.patch
 	default
+}
+
+src_compile() {
+	if use doc;then
+		emake html -C doc/v2/
+	fi
 }
 
 src_install() {
@@ -162,6 +172,13 @@ src_install() {
 		keepdir /var/lib/lava-server/default/media/
 		fowners -R lavaserver:lavaserver /var/lib/lava-server/default/
 		dobin ${FILESDIR}/lava-postinstall
+
+		if use doc;then
+			dodir /usr/share/lava-server/static/docs/
+			insinto /usr/share/lava-server/static/docs/
+			cd ${S}
+			doins -r doc/v2/_build/html/*
+		fi
 	else
 		einfo "Clean unused master files"
 		EPYTHON=python3.6
