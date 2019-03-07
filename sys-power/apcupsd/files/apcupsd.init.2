@@ -1,0 +1,50 @@
+#!/sbin/runscript
+# Copyright 2007 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: /var/cvsroot/gentoo-x86/sys-power/apcupsd/files/apcupsd.init.2,v 1.1 2009/01/15 15:21:11 flameeyes Exp $
+
+INSTANCE="${SVCNAME#*.}"
+if [ -z "${INSTANCE}" ] || [ "${SVCNAME}" = "apcupsd" ]; then
+	INSTANCE="apcupsd"
+fi
+
+depend() {
+	use net
+}
+
+start() {
+	rm -f /etc/apcupsd/powerfail
+
+	export SERVICE="${SVCNAME}"
+
+	/lib64/rc/bin/checkpath -d /run/lock/ --owner root:root -q --mode 775
+	/lib64/rc/bin/checkpath -d /run/lock/apcupsd --owner apcupsd:apcupsd -q
+	/lib64/rc/bin/checkpath -d /run/apcupsd --owner apcupsd:apcupsd -q --mode 750
+
+	ebegin "Starting APC UPS daemon"
+	for i in `seq 0 2`
+	do
+		if [ -e /dev/usb/hiddev${i} ];then
+			chmod 660 /dev/usb/hiddev${i}
+			chgrp apcupsd /dev/usb/hiddev${i}
+		fi
+	done
+	#TODO read if from config file
+#	chown apcupsd /var/log/apcupsd/apcupsd.events
+	start-stop-daemon \
+		--user apcupsd \
+		--start --pidfile "/run/apcupsd/${SVCNAME}.pid" \
+		--exec /sbin/apcupsd -- \
+		-f "/etc/apcupsd/${INSTANCE}.conf"
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping APC UPS daemon"
+	start-stop-daemon \
+		--stop --pidfile "/run/apcupsd/${SVCNAME}.pid" \
+            	--retry TERM/5/TERM/5 \
+		--exec /sbin/apcupsd
+	eend $?
+}
+
