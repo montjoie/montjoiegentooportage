@@ -8,7 +8,7 @@ NAME=lava-master
 PIDFILE=/var/run/$NAME.pid
 
 depend() {
-	use postgresql
+	use postgresql lava-logs
 }
 
 start() {
