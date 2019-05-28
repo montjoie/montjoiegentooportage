@@ -12,7 +12,7 @@ DESCRIPTION="lava CLI"
 HOMEPAGE="https://git.linaro.org/lava/lavacli.git"
 SRC_URI="https://git.linaro.org/lava/lavacli.git/snapshot/lavacli-${PV}.tar.gz"
 
-LICENSE="GPL"
+LICENSE="AGPL-3+"
 SLOT="0"
 KEYWORDS="amd64 arm arm64 x86"
 IUSE=""
