@@ -1,0 +1,10 @@
+--- a/setup.py.old	2019-06-18 13:57:29.772053630 -0000
++++ b/setup.py	2019-06-18 13:57:37.699053843 -0000
+@@ -52,7 +52,5 @@
+     packages=["lavacli", "lavacli.commands"],
+     entry_points={"console_scripts": ["lavacli = lavacli:main"]},
+     install_requires=["jinja2", "PyYAML", "pyzmq", "requests"],
+-    setup_requires=["pytest-runner"],
+-    tests_require=["pytest"],
+     zip_safe=True,
+ )

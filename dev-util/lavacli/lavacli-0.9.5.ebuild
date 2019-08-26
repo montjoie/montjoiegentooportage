@@ -9,10 +9,11 @@ inherit distutils-r1
 #inherit python-single-r1
 
 DESCRIPTION="lava CLI"
-HOMEPAGE="https://git.linaro.org/lava/lavacli.git"
-SRC_URI="https://git.linaro.org/lava/lavacli.git/snapshot/lavacli-${PV}.tar.gz"
+HOMEPAGE="https://git.lavasoftware.org/lava/lavacli.git"
+#SRC_URI="https://git.lavasoftwate.org/lava/lavacli.git/snapshot/lavacli-${PV}.tar.gz"
+SRC_URI="http://ftp.debian.org/debian/pool/main/l/lavacli/lavacli_${PV}.orig.tar.gz"
 
-LICENSE="AGPL-3+"
+LICENSE="AGPL-3"
 SLOT="0"
 KEYWORDS="amd64 arm arm64 x86"
 IUSE=""
@@ -21,4 +22,4 @@ DEPEND=""
 RDEPEND="${DEPEND} dev-python/pyzmq"
 RESTRICT="test"
 
-PATCHES="${FILESDIR}/notest.patch"
+PATCHES="${FILESDIR}/notest0.9.5.patch"
