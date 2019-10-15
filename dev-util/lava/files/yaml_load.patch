@@ -1,0 +1,124 @@
+From 55b550eb768a1e73ca2a0e65b8df7ea926bb74ae Mon Sep 17 00:00:00 2001
+From: Corentin LABBE <clabbe@baylibre.com>
+Date: Fri, 5 Jul 2019 11:23:37 +0200
+Subject: [PATCH] Convert yaml.load to explicit safe_load/unsafe_load
+
+On my gentoo, LAVA crash with
+2019-07-03 13:35:54,357   ERROR [CLOSE] Unknown exception raised, leaving!
+2019-07-03 13:35:54,357   ERROR Unsafe load() call disabled by Gentoo. See bug #659348
+Traceback (most recent call last):
+  File "/usr/lib64/python3.6/site-packages/lava_server/management/commands/lava-master.py", line 691, in handle
+    self.main_loop(options)
+  File "/usr/lib64/python3.6/site-packages/lava_server/management/commands/lava-master.py", line 735, in main_loop
+    while self.controler_socket():  # Unqueue all pending messages
+  File "/usr/lib64/python3.6/site-packages/lava_server/management/commands/lava-master.py", line 255, in controler_socket
+    self._handle_end(hostname, action, msg)
+  File "/usr/lib64/python3.6/site-packages/lava_server/management/commands/lava-master.py", line 344, in _handle_end
+    parse_job_description(job)
+  File "/usr/lib64/python3.6/site-packages/lava_scheduler_app/dbutils.py", line 142, in parse_job_description
+    pipeline = yaml.load(description)
+  File "/usr/lib64/python3.6/site-packages/yaml/__init__.py", line 109, in load
+    raise RuntimeError("Unsafe load() call disabled by Gentoo. See bug #659348")
+RuntimeError: Unsafe load() call disabled by Gentoo. See bug #659348
+
+Note that on recent ubuntu, a warning is displayed instead.
+
+Note that all yaml.load() with a specified  Loader= are unaffected.
+
+So we need to convert yaml.load to either safe_load or unsafe_load.
+This patch converts them.
+---
+ lava_dispatcher/tests/test_multinode.py   | 2 +-
+ lava_results_app/dbutils.py               | 6 +++---
+ lava_results_app/tests/test_names.py      | 2 +-
+ lava_scheduler_app/dbutils.py             | 2 +-
+ lava_scheduler_app/tests/test_pipeline.py | 2 +-
+ 5 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/lava_dispatcher/tests/test_multinode.py b/lava_dispatcher/tests/test_multinode.py
+index e05e1393e..b6f3743a3 100644
+--- a/lava_dispatcher/tests/test_multinode.py
++++ b/lava_dispatcher/tests/test_multinode.py
+@@ -287,7 +287,7 @@ class TestMultinode(StdoutTestCase):  # pylint: disable=too-many-public-methods
+         for action in self.client_job.pipeline.actions:
+             data = action.explode()
+             data_str = yaml.dump(data)
+-            yaml.load(data_str)  # nosec not suitable for safe_load
++            yaml.unsafe_load(data_str)  # nosec not suitable for safe_load
+ 
+     def test_multinode_timeout(self):
+         """
+diff --git a/lava_results_app/dbutils.py b/lava_results_app/dbutils.py
+index 8cfe55a95..d06bf193a 100644
+--- a/lava_results_app/dbutils.py
++++ b/lava_results_app/dbutils.py
+@@ -81,7 +81,7 @@ def append_failure_comment(job, msg):
+ def create_metadata_store(results, job):
+     """
+     Uses the OrderedDict import to correctly handle
+-    the yaml.load
++    the yaml.safe_load
+     """
+     if "extra" not in results:
+         return None
+@@ -95,7 +95,7 @@ def create_metadata_store(results, job):
+     os.makedirs(os.path.dirname(meta_filename), mode=0o755, exist_ok=True)
+     if os.path.exists(meta_filename):
+         with open(meta_filename, "r") as existing_store:
+-            data = yaml.load(existing_store)
++            data = yaml.unsafe_load(existing_store)
+         data.update(results["extra"])
+     else:
+         data = results["extra"]
+@@ -419,7 +419,7 @@ def map_metadata(description, job):
+     logger = logging.getLogger("lava-master")
+     try:
+         submission_data = yaml.safe_load(job.definition)
+-        description_data = yaml.load(description)
++        description_data = yaml.safe_load(description)
+     except yaml.YAMLError as exc:
+         logger.exception("[%s] %s", job.id, exc)
+         return False
+diff --git a/lava_results_app/tests/test_names.py b/lava_results_app/tests/test_names.py
+index b763548a8..d42598237 100644
+--- a/lava_results_app/tests/test_names.py
++++ b/lava_results_app/tests/test_names.py
+@@ -46,7 +46,7 @@ class ModelFactory:
+     def make_job_data(self, actions=None, **kw):
+         sample_job_file = os.path.join(os.path.dirname(__file__), "qemu.yaml")
+         with open(sample_job_file, "r") as test_support:
+-            data = yaml.load(test_support)  # nosec - unit test
++            data = yaml.safe_load(test_support)  # nosec - unit test
+         data.update(kw)
+         return data
+ 
+diff --git a/lava_scheduler_app/dbutils.py b/lava_scheduler_app/dbutils.py
+index 5d50bc08b..e4f5e91be 100644
+--- a/lava_scheduler_app/dbutils.py
++++ b/lava_scheduler_app/dbutils.py
+@@ -139,7 +139,7 @@ def parse_job_description(job):
+     try:
+         with open(filename, "r") as f_describe:
+             description = f_describe.read()
+-        pipeline = yaml.load(description)
++        pipeline = yaml.safe_load(description)
+     except (OSError, yaml.YAMLError):
+         logger.error("'Unable to open and parse '%s'", filename)
+         return
+diff --git a/lava_scheduler_app/tests/test_pipeline.py b/lava_scheduler_app/tests/test_pipeline.py
+index 5eb3d3f24..45a20546d 100644
+--- a/lava_scheduler_app/tests/test_pipeline.py
++++ b/lava_scheduler_app/tests/test_pipeline.py
+@@ -1234,7 +1234,7 @@ class TestYamlMultinode(TestCaseWithFactory):
+             meta_dict,
+         )
+         # simulate dynamic connection
+-        dynamic = yaml.load(  # nosec - not suitable for safe_load
++        dynamic = yaml.unsafe_load(  # nosec - not suitable for safe_load
+             open(
+                 os.path.join(
+                     os.path.dirname(__file__),
+-- 
+2.19.2
+
+

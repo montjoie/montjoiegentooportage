@@ -18,23 +18,31 @@ else
 	EGIT_REPO_URI="https://git.linaro.org/lava/lava.git"
 fi
 
+PATCHES="${FILESDIR}/yaml_load-2019.09.patch"
+
 #TODO feature check for NFS LXC
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="apache2 dispatcher ldap lxc nbd nfs qemu master screen telnet tftp xnbd"
+IUSE="apache2 dispatcher doc ldap lxc nbd nfs qemu master screen telnet tftp xnbd"
 
 DEPEND=""
 RDEPEND="${DEPEND}
 	master? ( dev-db/postgresql )
 	master? (
 		<dev-python/django-2[${PYTHON_USEDEP}]
-		dev-python/django-tables2[${PYTHON_USEDEP}]
+		>=dev-python/django-tables2-1.21.2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
+		dev-python/django-rest-framework[${PYTHON_USEDEP}]
+		dev-python/django-rest-framework-filters[${PYTHON_USEDEP}]
+		dev-python/django-filter[${PYTHON_USEDEP}]
+		dev-python/junit-xml[${PYTHON_USEDEP}]
+		dev-python/tappy[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
 	)
 	ldap? ( dev-python/django-auth-ldap )
 	apache2? ( www-servers/apache )
+	lxc? ( app-emulation/lxc )
 	nbd? ( sys-block/nbd )
 	nfs? ( net-fs/nfs-utils )
 	screen? ( app-misc/screen )
@@ -54,6 +62,10 @@ RDEPEND="${DEPEND}
 	dev-util/lava-tool
 	dev-python/pytz[${PYTHON_USEDEP}]
 	dev-python/python-dateutil[${PYTHON_USEDEP}]
+	doc? (
+		dev-python/sphinx
+		dev-python/sphinx-bootstrap-theme
+	)
 	dispatcher? (
 		app-emulation/libguestfs[python]
 		dev-embedded/u-boot-tools
@@ -92,17 +104,14 @@ pkg_setup() {
 }
 
 src_prepare() {
-	rm -r ${S}/google_analytics
-	sed -i 's,.*google_analytics.*,,' lava_server/settings/common.py || die
-	sed -i 's,.*google_analytics.*,,' lava_server/settings/development.py || die
-	sed -i 's,.*analytics.*,,I' lava_server/settings/common.py || die
-	sed -i 's,.*analytics.*,,' lava_server/templates/layouts/base.html || die
-
-	#validate our cleaning
-	grep -ri analytics lava_server && die
-
 	eapply "${FILESDIR}"/version-${PV}.patch
 	default
+}
+
+src_compile() {
+	if use doc;then
+		emake html -C doc/v2/
+	fi
 }
 
 src_install() {
@@ -113,7 +122,7 @@ src_install() {
 
 	if use master;then
 		dodir /etc
-		insinto /etc
+		insinto /etc/lava-server/
 
 		doins -r ${S}/etc/dispatcher-config
 
@@ -137,7 +146,7 @@ src_install() {
 		dodir /etc/lava-server/dispatcher-config/devices
 		dodir /etc/lava-server/dispatcher-config/health-checks
 		insinto /etc/lava-server/dispatcher-config/device-types/
-		doins ${S}/lava_scheduler_app/tests/device-types/*
+#		doins ${S}/lava_scheduler_app/tests/device-types/*
 		# HACK
 		EPYTHON=python3.6
 		ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/django/contrib/admin/static/admin/ ${D}/usr/share/lava-server/static/admin || die
@@ -168,6 +177,13 @@ src_install() {
 		keepdir /var/lib/lava-server/default/media/
 		fowners -R lavaserver:lavaserver /var/lib/lava-server/default/
 		dobin ${FILESDIR}/lava-postinstall
+
+		if use doc;then
+			dodir /usr/share/lava-server/static/docs/
+			insinto /usr/share/lava-server/static/docs/
+			cd ${S}
+			doins -r doc/v2/_build/html/*
+		fi
 	else
 		einfo "Clean unused master files"
 		EPYTHON=python3.6
@@ -186,8 +202,8 @@ src_install() {
 		fowners lavaserver:lavaserver /var/log/lava-dispatcher
 
 		if use tftp;then
-			echo '# fake tftpd-hpa config file for LAVA' > /etc/default/tftpd-hpa
-			echo 'TFTP_DIRECTORY="/var/lib/lava/dispatcher/tmp/"' >> /etc/default/tftpd-hpa
+			echo '# fake tftpd-hpa config file for LAVA' > ${D}/etc/default/tftpd-hpa
+			echo 'TFTP_DIRECTORY="/var/lib/lava/dispatcher/tmp/"' >> ${D}/etc/default/tftpd-hpa
 		fi
 	fi
 }

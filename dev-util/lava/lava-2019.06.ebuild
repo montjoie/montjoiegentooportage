@@ -77,6 +77,8 @@ RDEPEND="${DEPEND}
 		dev-python/python-magic[${PYTHON_USEDEP}]
 	)"
 
+PATCHES="${FILESDIR}/yaml_load.patch"
+
 pkg_pretend() {
 	if ! use master;then
 		for duse in apache2 ldap
@@ -204,7 +206,6 @@ src_install() {
 			echo 'TFTP_DIRECTORY="/var/lib/lava/dispatcher/tmp/"' >> /etc/default/tftpd-hpa
 		fi
 	fi
-	find ${D} -type f | xargs sed -i 's,yaml.load,yaml.safe_load,'
 }
 
 pkg_postinst() {
