@@ -1,30 +1,25 @@
-# Copyright 1999-2018 Gentoo Authors
+# Copyright 1999-2019 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-inherit autotools eutils flag-o-matic multilib pam
+EAPI=7
+inherit autotools desktop flag-o-matic multilib pam
 
 DESCRIPTION="A modular screen saver and locker for the X Window System"
 HOMEPAGE="https://www.jwz.org/xscreensaver/"
 SRC_URI="
-	${HOMEPAGE}${P}.tar.gz
+	${HOMEPAGE}${P}.tar.gz -> ${PF}.tar.gz
 "
 
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="~alpha amd64 ~arm ~arm64 hppa ~ia64 ~mips ~ppc ~ppc64 ~sh ~sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~x64-solaris ~x86-solaris"
-IUSE="gdm gnome gtk jpeg new-login offensive opengl pam +perl selinux suid xinerama"
+IUSE="gdm gtk jpeg new-login offensive opengl pam +perl selinux suid xinerama"
 
 COMMON_DEPEND="
-	gnome? ( >=gnome-base/libglade-2 )
 	dev-libs/libxml2
 	media-libs/netpbm
 	x11-apps/appres
 	x11-apps/xwininfo
-	gtk? (
-		x11-libs/gtk+:2
-		x11-libs/gdk-pixbuf:2[X]
-	)
 	x11-libs/libX11
 	x11-libs/libXext
 	x11-libs/libXft
@@ -34,6 +29,11 @@ COMMON_DEPEND="
 	x11-libs/libXt
 	x11-libs/libXxf86misc
 	x11-libs/libXxf86vm
+	gtk? (
+		>=gnome-base/libglade-2
+		x11-libs/gdk-pixbuf:2[X]
+		x11-libs/gtk+:2
+	)
 	jpeg? ( virtual/jpeg:0 )
 	new-login? (
 		gdm? ( gnome-base/gdm )
@@ -43,7 +43,7 @@ COMMON_DEPEND="
 		virtual/glu
 		virtual/opengl
 	)
-	pam? ( virtual/pam )
+	pam? ( sys-libs/pam )
 	xinerama? ( x11-libs/libXinerama )
 "
 # For USE="perl" see output of `qlist xscreensaver | grep bin | xargs grep '::'`
@@ -64,6 +64,14 @@ DEPEND="
 	virtual/pkgconfig
 	x11-base/xorg-proto
 "
+PATCHES=(
+	"${FILESDIR}"/${PN}-5.05-interix.patch
+	"${FILESDIR}"/${PN}-5.20-blurb-hndl-test-passwd.patch
+	"${FILESDIR}"/${PN}-5.20-test-passwd-segv-tty.patch
+	"${FILESDIR}"/${PN}-5.20-tests-miscfix.patch
+	"${FILESDIR}"/${PN}-5.31-pragma.patch
+	"${FILESDIR}"/${PN}-5.43-gentoo.patch
+)
 
 src_prepare() {
 	sed -i configure.in -e '/^ALL_LINGUAS=/d' || die
@@ -76,13 +84,7 @@ src_prepare() {
 			configure{,.in} || die
 	fi
 
-	eapply \
-		"${FILESDIR}"/${PN}-5.05-interix.patch \
-		"${FILESDIR}"/${PN}-5.20-blurb-hndl-test-passwd.patch \
-		"${FILESDIR}"/${PN}-5.20-test-passwd-segv-tty.patch \
-		"${FILESDIR}"/${PN}-5.20-tests-miscfix.patch \
-		"${FILESDIR}"/${PN}-5.31-pragma.patch \
-		"${FILESDIR}"/${PN}-5.35-gentoo.patch
+	default
 
 	use offensive || eapply "${FILESDIR}"/${PN}-5.35-offensive.patch
 
@@ -113,7 +115,7 @@ src_configure() {
 		--with-dpms-ext \
 		$(use_with gtk) \
 		--with-hackdir="${EPREFIX}"/usr/$(get_libdir)/misc/${PN} \
-		$(use_with gtk pixbuf)
+		$(use_with gtk pixbuf) \
 		--with-proc-interrupts \
 		--with-randr-ext \
 		--with-text-file="${EPREFIX}"/etc/gentoo-release \
