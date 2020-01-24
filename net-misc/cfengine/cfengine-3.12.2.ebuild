@@ -92,7 +92,9 @@ src_install() {
 	# find it. Most hosts cache their copy of the cfengine
 	# binaries here. This is the default search location for the
 	# binaries.
+	dodir /usr/sbin/
 	for bin in promises agent monitord serverd execd runagent key; do
+		mv "${D}"/usr/bin/cf-$bin "${D}"/usr/sbin/cf-$bin || die
 		dosym /usr/sbin/cf-$bin /var/cfengine/bin/cf-$bin || die
 	done
 
