@@ -1,0 +1,16 @@
+diff --git a/lava_results_app/dbutils.py b/lava_results_app/dbutils.py
+index da3e391a8..ad7a3037a 100644
+diff --git a/lava_scheduler_app/dbutils.py b/lava_scheduler_app/dbutils.py
+index 2b3316ef2..5b81f7e5f 100644
+--- a/lava_scheduler_app/dbutils.py
++++ b/lava_scheduler_app/dbutils.py
+@@ -129,7 +129,7 @@ def parse_job_description(job):
+     try:
+         with open(filename, "r") as f_describe:
+             description = f_describe.read()
+-        pipeline = yaml_load(description)
++        pipeline = yaml_safe_load(description)
+     except (OSError, yaml.YAMLError):
+         logger.error("'Unable to open and parse '%s'", filename)
+         return
+

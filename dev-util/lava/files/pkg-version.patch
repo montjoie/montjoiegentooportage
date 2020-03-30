@@ -1,0 +1,25 @@
+--- a/lava_common/utils.py.old	2019-12-16 13:20:57.470690697 -0000
++++ b/lava_common/utils.py	2019-12-16 13:24:09.925695850 -0000
+@@ -79,10 +79,12 @@
+     Use dpkg-query to retrive the version of the given package.
+     Distributions not derived from Debian will return an empty string.
+     """
++    if pkg == 'lava-server' or pkg == 'lava-dispatcher':
++        pkg = 'lava'
+     with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError):
+         return (
+             subprocess.check_output(  # nosec dpkg-query
+-                ("dpkg-query", "-W", "-f=${Version}\n", "%s" % pkg),
++                ("equery", "-q", "l", "--format='$fullversion'", "%s" % pkg),
+                 stderr=subprocess.STDOUT,
+             )
+             .strip()
+@@ -103,7 +105,7 @@
+     with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError):
+         pkg_str = (
+             subprocess.check_output(  # nosec dpkg-query
+-                ("dpkg-query", "-S", binary), stderr=subprocess.STDOUT
++                ("equery", "-q", "l", "--format='$fullversion'", "lava"), stderr=subprocess.STDOUT
+             )
+             .strip()
+             .decode("utf-8", errors="replace")
