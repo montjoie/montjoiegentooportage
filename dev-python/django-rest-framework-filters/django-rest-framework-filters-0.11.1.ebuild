@@ -12,7 +12,7 @@ HOMEPAGE="https://www.django-rest-framework.org/api-guide/filtering/#django-rest
 SRC_URI="https://files.pythonhosted.org/packages/c5/e7/e94c0834cc345b160d51bc57e6145c4903ce0d08db0cdd3d44fa43cc2059/djangorestframework-filters-0.11.1.tar.gz -> ${P}.tar.gz"
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="amd64 x86"
+KEYWORDS="amd64 arm x86"
 
 IUSE=""
 
