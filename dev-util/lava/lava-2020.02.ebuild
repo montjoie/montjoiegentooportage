@@ -34,7 +34,7 @@ DEPEND=""
 RDEPEND="${DEPEND}
 	master? ( dev-db/postgresql )
 	master? (
-		<dev-python/django-2[${PYTHON_USEDEP}]
+		=dev-python/django-2.2.11[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-1.21.2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		dev-python/django-rest-framework[${PYTHON_USEDEP}]
@@ -43,6 +43,7 @@ RDEPEND="${DEPEND}
 		dev-python/django-filter[${PYTHON_USEDEP}]
 		dev-python/junit-xml[${PYTHON_USEDEP}]
 		dev-python/tappy[${PYTHON_USEDEP}]
+		dev-python/whitenoise[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
 	)
 	ldap? ( dev-python/django-auth-ldap )
@@ -76,7 +77,6 @@ RDEPEND="${DEPEND}
 		dev-embedded/u-boot-tools
 		tftp? ( net-ftp/tftp-hpa )
 		qemu? (
-			app-emulation/libguestfs
 			app-emulation/supermin
 			)
 		dev-python/configobj[${PYTHON_USEDEP}]
@@ -220,9 +220,11 @@ pkg_postinst() {
 	fi
 
 	if use master;then
+		einfo "On the first install, simply run lava-postinstall"
 		einfo "Create an admin account with lava-server manage users add --passwd adminpassword --staff --superuser admin"
+		einfo "Then you can add workers via lavacli"
+		einfo "Dont forget to add ALLOWED_HOSTS in /etc/lava-server/settings.conf"
 		einfo "if you upgrade LAVA, please run lava-server manage migrate (see share/postinst.py TODO)"
-		einfo "TODO use postinst for database init"
 	fi
 
 	if use qemu;then
