@@ -13,12 +13,10 @@ if [[ "${PV}" != "9999" ]]; then
 else
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/libguestfs/supermin.git"
-	KEYWORDS="amd64 arm arm64 x86"
 fi
 
-LICENSE=""
+LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm arm64 x86"
 IUSE=""
 
 DEPEND="dev-ml/ocamlbuild"

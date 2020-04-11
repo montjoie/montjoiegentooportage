@@ -5,7 +5,7 @@ EAPI=7
 
 PATCHSET=1
 
-inherit eutils user java-pkg-opt-2 systemd
+inherit eutils java-pkg-opt-2 systemd
 
 MY_P=${P/_/-}
 
@@ -27,6 +27,8 @@ RESTRICT="!test? ( test )"
 # Some of the mysql plugins use DBD::mysql, while others call mysqladmin directly.
 # We replace the original ipmi plugins with the freeipmi_ plugin which at least works.
 DEPEND_COM="
+	acct-user/munin
+	acct-group/munin
 	dev-lang/perl
 	dev-perl/Net-CIDR
 	dev-perl/Net-Server[ipv6(-)?]
@@ -101,21 +103,15 @@ RDEPEND="${DEPEND_COM}
 			|| ( net-analyzer/netcat net-analyzer/openbsd-netcat )
 		)
 		!minimal? (
+			acct-user/munin-async
 			virtual/cron
 			media-fonts/dejavu
 		)
-		selinux? ( sec-policy/selinux-munin )
-		!<sys-apps/openrc-0.11.8"
+		selinux? ( sec-policy/selinux-munin )"
 
 S="${WORKDIR}/${MY_P}"
 
 pkg_setup() {
-	enewgroup munin
-	enewuser munin 177 -1 /var/lib/munin munin
-	if ! use minimal ;then
-		enewuser munin-async -1 /bin/sh /var/spool/munin-async
-		esethome munin-async /var/spool/munin-async
-	fi
 	java-pkg-opt-2_pkg_setup
 }
 

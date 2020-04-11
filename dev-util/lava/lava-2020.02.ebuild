@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_REQ_USE="sqlite"
+#PYTHON_REQ_USE="sqlite"
 PYTHON_COMPAT=( python3_6 )
 inherit autotools distutils-r1 user
 
