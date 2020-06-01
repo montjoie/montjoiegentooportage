@@ -1,0 +1,68 @@
+--- a/lava_rest_app/base/views.py.old	2020-05-29 06:37:45.000000000 -0000
++++ b/lava_rest_app/base/views.py	2020-05-29 06:38:06.000000000 -0000
+@@ -18,7 +18,6 @@
+ # along with LAVA.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import io
+-import junit_xml
+ import tap
+ 
+ from lava_scheduler_app.models import (
+@@ -113,7 +112,6 @@
+ 
+     The test results are also available in JUnit and TAP13 at:
+ 
+-    * `/jobs/<job_id>/junit/`
+     * `/jobs/<job_id>/tap13/`
+     """
+ 
+@@ -149,49 +147,6 @@
+             .visible_by_user(self.request.user)
+         )
+ 
+-    @detail_route(methods=["get"], suffix="junit")
+-    def junit(self, request, **kwargs):
+-        suites = []
+-        for suite in self.get_object().testsuite_set.all().order_by("id"):
+-            cases = []
+-            for case in suite.testcase_set.all().order_by("id"):
+-                # Grab the duration
+-                md = case.action_metadata
+-                duration = None
+-                if md is not None:
+-                    duration = md.get("duration")
+-                    if duration is not None:
+-                        duration = float(duration)
+-
+-                # Build the test case junit object
+-                tc = junit_xml.TestCase(
+-                    case.name,
+-                    elapsed_sec=duration,
+-                    classname=case.suite.name,
+-                    timestamp=case.logged,
+-                )
+-                if case.result == TestCase.RESULT_FAIL:
+-                    logs = None
+-                    # TODO: is this of any use? (yaml inside xml!)
+-                    if (
+-                        case.start_log_line is not None
+-                        and case.end_log_line is not None
+-                    ):
+-                        logs = logs_instance.read(
+-                            self.get_object(), case.start_log_line, case.end_log_line
+-                        )
+-                    tc.add_error_info("failed", output=logs)
+-                elif case.result == TestCase.RESULT_SKIP:
+-                    tc.add_skipped_info("skipped")
+-                cases.append(tc)
+-            suites.append(junit_xml.TestSuite(suite.name, test_cases=cases))
+-
+-        data = junit_xml.TestSuite.to_xml_string(suites, encoding="utf-8")
+-        response = HttpResponse(data, content_type="application/xml")
+-        response["Content-Disposition"] = (
+-            "attachment; filename=job_%d.xml" % self.get_object().id
+-        )
+-        return response
+ 
+     @detail_route(methods=["get"], suffix="logs")
+     def logs(self, request, **kwargs):

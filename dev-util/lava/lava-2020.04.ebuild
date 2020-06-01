@@ -4,7 +4,7 @@
 EAPI=7
 
 PYTHON_REQ_USE="sqlite"
-PYTHON_COMPAT=( python3_6 )
+PYTHON_COMPAT=( python3_{6,7} )
 inherit autotools distutils-r1 user
 
 DESCRIPTION="LAVA"
@@ -41,7 +41,6 @@ RDEPEND="${DEPEND}
 		dev-python/django-rest-framework-filters[${PYTHON_USEDEP}]
 		<dev-python/django-rest-framework-extensions-0.5.0[${PYTHON_USEDEP}]
 		dev-python/django-filter[${PYTHON_USEDEP}]
-		dev-python/junit-xml[${PYTHON_USEDEP}]
 		dev-python/tappy[${PYTHON_USEDEP}]
 		dev-python/whitenoise[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
