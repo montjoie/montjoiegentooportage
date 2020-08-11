@@ -35,7 +35,7 @@ DEPEND=""
 RDEPEND="${DEPEND}
 	master? ( dev-db/postgresql )
 	master? (
-		=dev-python/django-2.2.11[${PYTHON_USEDEP}]
+		<dev-python/django-3[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-1.21.2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		dev-python/django-rest-framework[${PYTHON_USEDEP}]
@@ -66,7 +66,6 @@ RDEPEND="${DEPEND}
 	dev-python/nose[${PYTHON_USEDEP}]
 	dev-python/pyzmq[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]
-	dev-util/lava-tool
 	dev-python/pytz[${PYTHON_USEDEP}]
 	dev-python/python-dateutil[${PYTHON_USEDEP}]
 	doc? (
@@ -166,7 +165,7 @@ src_install() {
 		ln -s /usr/$(get_libdir)/$EPYTHON/site-packages/lava_results_app/static/lava_results_app ${D}/usr/share/lava-server/static/lava_results_app || die
 
 		if ! use ldap;then
-			sed -i 's,import ldap,,' ${D}/usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/utils.py
+			sed -i 's,import ldap,,' ${D}/usr/lib/$EPYTHON/site-packages/lava_scheduler_app/utils.py
 		fi
 
 		#apache2
@@ -178,9 +177,9 @@ src_install() {
 
 		# I found too ugly to install nodejs just for that
 		# TODO add a real-minify use flag which depend on nodejs
-		cd ${D}/usr/$(get_libdir)/$EPYTHON/site-packages/lava_server/static/lava_server/js/ || die
+		cd ${D}/usr/lib/$EPYTHON/site-packages/lava_server/static/lava_server/js/ || die
 		sh ${FILESDIR}/minify || die
-		cd ${D}/usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app/js || die
+		cd ${D}/usr/lib/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app/js || die
 		sh ${FILESDIR}/minify || die
 
 		dodir /var/lib/lava-server/default/
