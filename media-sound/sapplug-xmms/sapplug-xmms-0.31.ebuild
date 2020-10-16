@@ -1,8 +1,7 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
 
-EAPI=3
+EAPI=7
 
 inherit eutils
 
@@ -10,7 +9,7 @@ DESCRIPTION="SAP plug in for xmms"
 HOMEPAGE="http://asma.atari.org/bin/"
 SRC_URI="http://asma.atari.org/bin/${P}.tar.gz"
 
-LICENSE=""
+LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="amd64 x86"
 IUSE=""
@@ -19,8 +18,8 @@ DEPEND="media-sound/xmms"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
-	epatch ${FILESDIR}/sapEngine_const.patch
-	epatch ${FILESDIR}/makefile.patch
+	epatch "${FILESDIR}/sapEngine_const.patch"
+	epatch "${FILESDIR}/makefile.patch"
 #	epatch ${FILESDIR}/makefile_cflag.patch
 #	epatch ${FILESDIR}/deref.patch
 #	epatch ${FILESDIR}/deref2.patch
