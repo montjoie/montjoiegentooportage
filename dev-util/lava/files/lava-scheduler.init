@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+DAEMON="/usr/bin/lava-server"
+DAEMON_ARGS="manage lava-scheduler $LOGFILE $LOGLEVEL"
+NAME=lava-scheduler
+PIDFILE=/var/run/$NAME.pid
+
+depend() {
+	use postgresql lava-logs
+}
+
+start() {
+	ebegin "Starting ${SVCNAME}"
+	start-stop-daemon --start --quiet --background --pidfile $PIDFILE --make-pidfile --exec $DAEMON -- $DAEMON_ARGS
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping ${SVCNAME}"
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	eend $?
+}

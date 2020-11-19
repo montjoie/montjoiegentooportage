@@ -1,0 +1,35 @@
+#!/sbin/openrc-run
+# Copyright 1999-2017 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+depend() {
+	use dns
+}
+
+# Default variables
+MASTER_URL="http://localhost"
+LOGLEVEL="DEBUG"
+
+#default will be lava-worker
+NAME=$(echo $SVCNAME | cut -d_ -f2-)
+if [ -z "$NAME" ];then
+	NAME=lava-worker
+fi
+
+PIDFILE=/var/run/$NAME.pid
+
+[ -r /etc/lava-dispatcher/$NAME ] && . /etc/lava-dispatcher/$NAME
+
+DAEMON_ARGS="--url $MASTER_URL --level $LOGLEVEL --name $NAME --log-file /var/log/lava-dispatcher/$NAME.log --token-file--token-file /var/lib/lava/dispatcher/$NAME/token --exit-on-version-mismatch"
+
+start() {
+	ebegin "Starting ${SVCNAME} for worker $NAME"
+	start-stop-daemon --start --background --pidfile $PIDFILE --make-pidfile --name $NAME /usr/bin/lava-worker -- $DAEMON_ARGS
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping ${SVCNAME} for worker $NAME"
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	eend $?
+}
