@@ -91,8 +91,6 @@ DEPEND="${COMMON_DEPEND}
 	dev-util/gperf
 	>=dev-lang/ocaml-4.03[ocamlopt]
 	dev-ml/findlib[ocamlopt]
-	dev-ml/ocaml-gettext
-	>=dev-ml/ounit-2
 	doc? ( app-text/po4a )
 	ruby? ( dev-lang/ruby virtual/rubygems dev-ruby/rake )
 	test? ( introspection? ( dev-libs/gjs ) )
