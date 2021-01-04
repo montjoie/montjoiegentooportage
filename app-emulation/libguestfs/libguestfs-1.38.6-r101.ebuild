@@ -1,4 +1,4 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
@@ -41,11 +41,11 @@ COMMON_DEPEND="
 	sys-apps/fakeroot
 	sys-apps/file
 	libvirt? ( app-emulation/libvirt )
-	dev-libs/libxml2:2
+	dev-libs/libxml2:2=
 	>=sys-apps/fakechroot-2.8
 	>=app-admin/augeas-1.8.0
 	sys-fs/squashfs-tools:*
-	dev-libs/libconfig
+	dev-libs/libconfig:=
 	sys-libs/readline:0=
 	>=sys-libs/db-4.6:*
 	app-arch/xz-utils
@@ -72,7 +72,7 @@ COMMON_DEPEND="
 		sys-libs/libsemanage
 	)
 	systemtap? ( dev-util/systemtap )
-	ocaml? ( >=dev-lang/ocaml-4.03[ocamlopt] )
+	ocaml? ( >=dev-lang/ocaml-4.03:=[ocamlopt] )
 	erlang? ( dev-lang/erlang )
 	inspect-icons? (
 		media-libs/netpbm
@@ -86,12 +86,12 @@ COMMON_DEPEND="
 		sys-apps/dbus
 		x11-libs/gtk+:3
 	)
-	net-libs/libtirpc
-	sys-libs/libxcrypt
+	net-libs/libtirpc:=
+	sys-libs/libxcrypt:=
 	"
 DEPEND="${COMMON_DEPEND}
 	dev-util/gperf
-	>=dev-lang/ocaml-4.03[ocamlopt]
+	>=dev-lang/ocaml-4.03:=[ocamlopt]
 	dev-ml/findlib[ocamlopt]
 	doc? ( app-text/po4a )
 	ruby? ( dev-lang/ruby virtual/rubygems dev-ruby/rake )
