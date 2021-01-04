@@ -135,6 +135,7 @@ src_install() {
 
 		doins -r "${S}/etc/dispatcher-config"
 
+		newinitd "${FILESDIR}/lava-publisher.init" lava-publisher
 		newinitd "${FILESDIR}/lava-scheduler.init" lava-scheduler
 		newinitd "${FILESDIR}/lava-server-gunicorn.init" lava-server-gunicorn
 

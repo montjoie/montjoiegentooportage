@@ -20,7 +20,7 @@ PIDFILE=/var/run/$NAME.pid
 
 [ -r /etc/lava-dispatcher/$NAME ] && . /etc/lava-dispatcher/$NAME
 
-DAEMON_ARGS="--url $MASTER_URL --level $LOGLEVEL --name $NAME --log-file /var/log/lava-dispatcher/$NAME.log --token-file /var/lib/lava/dispatcher/$NAME/token --exit-on-version-mismatch"
+DAEMON_ARGS="--url $MASTER_URL --level $LOGLEVEL --name $NAME --log-file /var/log/lava-dispatcher/$NAME.log --token-file /var/lib/lava/dispatcher/$NAME/token --exit-on-version-mismatch $EXTRA_OPTS"
 
 start() {
 	ebegin "Starting ${SVCNAME} for worker $NAME"
