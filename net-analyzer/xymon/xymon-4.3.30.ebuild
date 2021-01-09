@@ -204,7 +204,7 @@ src_install() {
 		fowners -R xymon:xymon /usr/xymon/server/www/ || die
 
 		touch "${D}"/etc/xymon/cookies.session || die
-		fowners xymon:apache /etc/xymon/cookies.session || die
+		fowners xymon:xymon /etc/xymon/cookies.session || die
 		fperms 640 /etc/xymon/cookies.session || die
 
 		if use apache2 ; then

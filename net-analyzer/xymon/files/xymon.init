@@ -43,6 +43,8 @@ reload() {
 
 start() {
 	ebegin "Starting $NAME"
+		# rotate log
+		mv /var/log/xymon/xymond.log /var/log/xymon/xymond.log-$(date +%Y%m%d-%H%M)
 		mkdir -p $PIDDIR
 		chown xymon:xymon $PIDDIR
 		#start-stop-daemon --user xymon:xymon --start $start_stop_daemon_args --exec $command -- start
