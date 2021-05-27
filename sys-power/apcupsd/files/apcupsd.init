@@ -1,0 +1,78 @@
+#!/sbin/openrc-run
+# Copyright 1999-2021 Gentoo Authors
+# Distributed under the terms of the GNU General Public License v2
+
+INSTANCE="${SVCNAME#*.}"
+if [ -z "${INSTANCE}" ] || [ "${SVCNAME}" = "apcupsd" ]; then
+	INSTANCE="apcupsd"
+fi
+
+: ${APCUPSD_CONFIGFILE:=/etc/apcupsd/${SVCNAME#*.}.conf}
+: ${APCUPSD_POWERFAILFILE:=/etc/apcupsd/powerfail}
+: ${APCUPSD_PIDFILE:=/run/apcupsd/${SVCNAME}.pid}
+: ${APCUPSD_SSDARGS:=--wait 1000}
+: ${APCUPSD_TERMTIMEOUT:=TERM/60/KILL/5}
+
+dir="/run/apcupsd"
+apcuser=apcupsd
+apcgroup=apcupsd
+
+pidfile="${APCUPSD_PIDFILE}"
+retry="${APCUPSD_TERMTIMEOUT}"
+start_stop_daemon_args="${APCUPSD_SSDARGS}"
+required_files="${APCUPSD_CONFIGFILE}"
+
+depend() {
+	use dns
+}
+
+start_pre() {
+	if [ -e "${APCUPSD_POWERFAILFILE}" ] ; then
+		ebegin "Removing stale ${APCUPSD_POWERFAILFILE}"
+		rm "${APCUPSD_POWERFAILFILE}"
+		eend $?
+	fi
+        checkpath -d -m 0775 -o $apcuser:$apcgroup ${dir} 
+}
+
+start() {
+	rm -f /etc/apcupsd/powerfail
+
+	export SERVICE="${SVCNAME}"
+
+	if [ ! -d "${dir}" ]; then
+		einfo " Creating ${dir}"
+		/bin/mkdir -p "${dir}"
+		/bin/chown $apcuser:$apcgroup "${dir}"
+	fi
+	/lib/rc/bin/checkpath -d /run/lock/ --owner root:root -q --mode 775
+	/lib/rc/bin/checkpath -d /run/lock/apcupsd --owner $apcuser:apcupsd -q
+	/lib/rc/bin/checkpath -d /run/apcupsd --owner apcupsd:apcupsd -q --mode 750
+
+	for i in `seq 0 2`
+	do
+		if [ -e /dev/usb/hiddev${i} ];then
+			chmod 660 /dev/usb/hiddev${i}
+			chgrp apcupsd /dev/usb/hiddev${i}
+		fi
+	done
+
+	ebegin "Starting APC UPS daemon"
+	start-stop-daemon \
+		--user $apcuser \
+		--start --pidfile "${pidfile}" \
+		--exec /sbin/apcupsd -- \
+		-f "/etc/apcupsd/${INSTANCE}.conf" \
+		-P "${pidfile}"
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping APC UPS daemon"
+	start-stop-daemon \
+		--stop --pidfile "${pidfile}" \
+		--retry TERM/5/TERM/5 \
+		--exec /sbin/apcupsd
+	eend $?
+}
+
