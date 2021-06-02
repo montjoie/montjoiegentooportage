@@ -4,7 +4,7 @@
 EAPI=7
 
 LUA_COMPAT=( lua5-1 )
-PYTHON_COMPAT=( python3_{6,7,8} )
+PYTHON_COMPAT=( python3_{6,7,8,9} )
 
 inherit autotools bash-completion-r1 l10n linux-info lua-single perl-functions python-single-r1 xdg-utils flag-o-matic
 
