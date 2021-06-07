@@ -1,0 +1,12 @@
+--- ./common/mlpcre/pcre-c.c.old	2021-06-07 16:29:26.923382092 -0000
++++ ./common/mlpcre/pcre-c.c	2021-06-07 16:29:34.883293500 -0000
+@@ -43,7 +43,7 @@
+  * to OCaml runtime in 2017.
+  */
+ #ifndef HAVE_CAML_ALLOC_INITIALIZED_STRING
+-static inline value
++inline value
+ caml_alloc_initialized_string (mlsize_t len, const char *p)
+ {
+   value sv = caml_alloc_string (len);
+
