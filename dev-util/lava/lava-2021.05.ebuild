@@ -43,6 +43,8 @@ RDEPEND="${DEPEND}
 		dev-python/django-rest-framework-filters[${PYTHON_USEDEP}]
 		<dev-python/django-rest-framework-extensions-0.5.0[${PYTHON_USEDEP}]
 		dev-python/django-filter[${PYTHON_USEDEP}]
+		dev-python/django-environ[${PYTHON_USEDEP}]
+		dev-python/psycopg[${PYTHON_USEDEP}]
 		dev-python/tappy[${PYTHON_USEDEP}]
 		dev-python/whitenoise[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
@@ -56,17 +58,15 @@ RDEPEND="${DEPEND}
 	screen? ( app-misc/screen )
 	telnet? ( net-misc/telnet-bsd )
 	xnbd? ( sys-block/xnbd )
-	dev-python/psycopg[${PYTHON_USEDEP}]
 	dev-python/simplejson[${PYTHON_USEDEP}]
 	dev-python/pyyaml[libyaml]
 	dev-python/jinja[${PYTHON_USEDEP}]
 	dev-python/pexpect[${PYTHON_USEDEP}]
 	dev-python/voluptuous[${PYTHON_USEDEP}]
-	dev-python/pyserial[${PYTHON_USEDEP}]
 	dev-python/netifaces[${PYTHON_USEDEP}]
-	dev-python/nose[${PYTHON_USEDEP}]
 	dev-python/requests[${PYTHON_USEDEP}]
 	dev-python/pytz[${PYTHON_USEDEP}]
+	dev-python/pyzmq[${PYTHON_USEDEP}]
 	dev-python/python-dateutil[${PYTHON_USEDEP}]
 	doc? (
 		dev-python/sphinx
@@ -81,6 +81,8 @@ RDEPEND="${DEPEND}
 			)
 		dev-python/aiohttp[${PYTHON_USEDEP}]
 		dev-python/configobj[${PYTHON_USEDEP}]
+		dev-python/nose[${PYTHON_USEDEP}]
+		dev-python/pyserial[${PYTHON_USEDEP}]
 		dev-python/pyudev[${PYTHON_USEDEP}]
 		dev-python/python-magic[${PYTHON_USEDEP}]
 	)"
@@ -127,7 +129,9 @@ src_install() {
 	#python_foreach_impl python_newexe ${S}/manage.py lava-server || die
 	#python_foreach_impl python_fix_shebang ${D}/usr/
 	#distutils-r1_python_install
-	python3.7 setup.py install --root="${D}"
+	# HACK
+	EPYTHON=python3.9
+	$EPYTHON setup.py install --root="${D}"
 
 	if use master;then
 		dodir /etc
@@ -158,8 +162,6 @@ src_install() {
 		dodir /usr/share/lava-server/device-types/
 		mv "${D}/etc/lava-server/dispatcher-config/device-types/"* "${D}/usr/share/lava-server/device-types/"
 
-		# HACK
-		EPYTHON=python3.9
 		ln -s "/usr/$(get_libdir)/$EPYTHON/site-packages/django/contrib/admin/static/admin/" "${D}/usr/share/lava-server/static/admin" || die
 		ln -s "/usr/$(get_libdir)/$EPYTHON/site-packages/lava_server/static/lava_server" "${D}/usr/share/lava-server/static/lava_server" || die
 		ln -s "/usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app" "${D}/usr/share/lava-server/static/lava_scheduler_app" || die
