@@ -1,0 +1,58 @@
+--- lava_scheduler_app/tasks.py.old	2021-06-08 05:34:23.518000000 -0000
++++ lava_scheduler_app/tasks.py	2021-06-08 05:34:43.294000000 -0000
+@@ -1,4 +1,4 @@
+-from celery import shared_task
++#from celery import shared_task
+ 
+ from django.core.exceptions import ObjectDoesNotExist
+ 
+@@ -10,29 +10,3 @@
+     send_notifications,
+ )
+ 
+-
+-# TODO: pass state, health and old_health
+-@shared_task(ignore_result=True)
+-def async_send_notifications(
+-    job_id: int, state: int, health: int, old_health: int
+-) -> None:
+-    try:
+-        job = TestJob.objects.get(id=job_id)
+-    except TestJob.DoesNotExist:
+-        return
+-
+-    job_def = yaml_safe_load(job.definition)
+-    if "notify" in job_def:
+-        if notification_criteria(
+-            job.id, job_def["notify"]["criteria"], state, health, old_health
+-        ):
+-            # Set state and health as the task can run later while the job
+-            # state and health already changed.
+-            # The code is *not* saving the job so this won't have any effect on the db.
+-            job.state = state
+-            job.health = health
+-            try:
+-                job.notification
+-            except ObjectDoesNotExist:
+-                create_notification(job, job_def["notify"])
+-            send_notifications(job)
+--- lava_scheduler_app/signals.py.old	2021-06-08 05:35:53.325000000 -0000
++++ lava_scheduler_app/signals.py	2021-06-08 05:35:37.741000000 -0000
+@@ -31,7 +31,7 @@
+ from django.db.models.signals import post_init, post_save, pre_delete, pre_save
+ 
+ from lava_scheduler_app.models import Device, TestJob, Worker
+-from lava_scheduler_app.tasks import async_send_notifications
++#from lava_scheduler_app.tasks import async_send_notifications
+ 
+ 
+ # Thread local storage for zmq socket and context
+@@ -145,7 +145,7 @@
+     if job.state not in [TestJob.STATE_RUNNING, TestJob.STATE_FINISHED]:
+         return
+ 
+-    async_send_notifications.delay(job.id, job.state, job.health, job._old_health)
++    #async_send_notifications.delay(job.id, job.state, job.health, job._old_health)
+ 
+ 
+ @log_exception
