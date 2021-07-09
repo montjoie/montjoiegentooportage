@@ -1,23 +1,25 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
-inherit autotools desktop eutils flag-o-matic multilib pam
+inherit autotools flag-o-matic multilib optfeature pam strip-linguas
 
-DESCRIPTION="A modular screen saver and locker for the X Window System"
+DESCRIPTION="modular screen saver and locker for the X Window System"
 HOMEPAGE="https://www.jwz.org/xscreensaver/"
-SRC_URI="
-	https://www.jwz.org/xscreensaver/${P}.tar.gz
-"
+SRC_URI="https://www.jwz.org/xscreensaver/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sparc x86 ~amd64-linux ~x86-linux ~x64-solaris ~x86-solaris"
-IUSE="caps gdm gtk jpeg new-login offensive opengl pam +perl selinux suid xinerama"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ~mips ppc ppc64 sparc x86 ~amd64-linux ~x86-linux"
+IUSE="caps +gdk-pixbuf gdm +gtk jpeg +locking new-login offensive opengl pam +perl selinux suid systemd xinerama"
+REQUIRED_USE="
+	gdk-pixbuf? ( gtk )
+"
 
 COMMON_DEPEND="
 	dev-libs/libxml2
 	media-libs/netpbm
+	virtual/libcrypt:=
 	x11-apps/appres
 	x11-apps/xwininfo
 	x11-libs/libX11
@@ -29,9 +31,12 @@ COMMON_DEPEND="
 	x11-libs/libXt
 	x11-libs/libXxf86vm
 	caps? ( sys-libs/libcap )
+	gdk-pixbuf? (
+		x11-libs/gdk-pixbuf-xlib
+		>=x11-libs/gdk-pixbuf-2.42.0:2
+	)
 	gtk? (
 		>=gnome-base/libglade-2
-		x11-libs/gdk-pixbuf:2[X]
 		x11-libs/gtk+:2
 	)
 	jpeg? ( virtual/jpeg:0 )
@@ -44,6 +49,7 @@ COMMON_DEPEND="
 		virtual/opengl
 	)
 	pam? ( sys-libs/pam )
+	systemd? ( >=sys-apps/systemd-221 )
 	xinerama? ( x11-libs/libXinerama )
 "
 # For USE="perl" see output of `qlist xscreensaver | grep bin | xargs grep '::'`
@@ -65,22 +71,25 @@ DEPEND="
 	x11-base/xorg-proto
 "
 PATCHES=(
-	"${FILESDIR}"/${PN}-remove-libXxf86misc-dep.patch
-	"${FILESDIR}"/${PN}-5.05-interix.patch
+	"${FILESDIR}"/${PN}-5.45-remove-libXxf86misc-dep.patch
+	"${FILESDIR}"/${PN}-5.45-interix.patch
 	"${FILESDIR}"/${PN}-5.31-pragma.patch
 	"${FILESDIR}"/${PN}-5.44-blurb-hndl-test-passwd.patch
 	"${FILESDIR}"/${PN}-5.44-gentoo.patch
+	"${FILESDIR}"/${PN}-5.45-gcc.patch
+	"${FILESDIR}"/${PN}-5.45-configure.ac-sandbox.patch
+	"${FILESDIR}"/${P}-cve-2021-34557.patch  # bug 794475
 )
 
 src_prepare() {
-	sed -i configure.in -e '/^ALL_LINGUAS=/d' || die
+	sed -i configure.ac -e '/^ALL_LINGUAS=/d' || die
 	strip-linguas -i po/
 	export ALL_LINGUAS="${LINGUAS}"
 
 	if use new-login && ! use gdm; then #392967
 		sed -i \
 			-e "/default_l.*1/s:gdmflexiserver -ls:${EPREFIX}/usr/libexec/lightdm/&:" \
-			configure{,.in} || die
+			configure{,.ac} || die
 	fi
 
 	default
@@ -113,23 +122,24 @@ src_configure() {
 	export RPM_PACKAGE_VERSION=no #368025
 
 	econf \
+		$(use_enable locking) \
 		$(use_with caps setcap-hacks) \
+		$(use_with gdk-pixbuf pixbuf) \
+		$(use_with gtk) \
 		$(use_with jpeg) \
 		$(use_with new-login login-manager) \
 		$(use_with opengl gl) \
 		$(use_with pam) \
 		$(use_with suid setuid-hacks) \
+		$(use_with systemd) \
 		$(use_with xinerama xinerama-ext) \
-		--enable-locking \
+		--with-app-defaults="${EPREFIX}"/usr/share/X11/app-defaults \
 		--with-configdir="${EPREFIX}"/usr/share/${PN}/config \
 		--with-dpms-ext \
-		$(use_with gtk) \
 		--with-hackdir="${EPREFIX}"/usr/$(get_libdir)/misc/${PN} \
-		$(use_with gtk pixbuf) \
 		--with-proc-interrupts \
 		--with-randr-ext \
 		--with-text-file="${EPREFIX}"/etc/gentoo-release \
-		--with-x-app-defaults="${EPREFIX}"/usr/share/X11/app-defaults \
 		--with-xdbe-ext \
 		--with-xf86gamma-ext \
 		--with-xf86vmode-ext \
@@ -137,6 +147,7 @@ src_configure() {
 		--with-xshm-ext \
 		--without-gle \
 		--without-kerberos \
+		--without-motif \
 		--x-includes="${EPREFIX}"/usr/include \
 		--x-libraries="${EPREFIX}"/usr/$(get_libdir)
 }
@@ -146,8 +157,15 @@ src_install() {
 
 	dodoc README{,.hacking}
 
-	use pam && fperms 755 /usr/bin/${PN}
-	pamd_mimic_system ${PN} auth
+	if use pam; then
+		fperms 755 /usr/bin/${PN}
+		pamd_mimic_system ${PN} auth
+	fi
 
 	rm -f "${ED}"/usr/share/${PN}/config/{electricsheep,fireflies}.xml
+}
+
+pkg_postinst() {
+	optfeature 'Bitmap fonts 75dpi' media-fonts/font-adobe-75dpi
+	optfeature 'Bitmap fonts 100dpi' media-fonts/font-adobe-100dpi
 }
