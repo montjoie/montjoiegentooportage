@@ -107,7 +107,7 @@ pkg_pretend() {
 
 src_prepare() {
 	default
-	epatch "${FILESDIR}/no-celery.patch"
+	#epatch "${FILESDIR}/no-celery.patch"
 	#find ${S} -name '__pycache__' -type f | xargs rm -v
 }
 
