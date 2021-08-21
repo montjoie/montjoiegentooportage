@@ -1,38 +1,43 @@
-# Copyright 1999-2013 Gentoo Foundation
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/net-analyzer/munin/munin-2.0.14.ebuild,v 1.2 2013/06/11 19:08:25 maekke Exp $
 
-EAPI=5
+EAPI=7
 
 PATCHSET=1
 
-inherit eutils java-pkg-opt-2 user
+inherit eutils java-pkg-opt-2 systemd tmpfiles
 
 MY_P=${P/_/-}
 
 DESCRIPTION="Munin Server Monitoring Tool"
 HOMEPAGE="http://munin-monitoring.org/"
 SRC_URI="
-	mirror://sourceforge/munin/${MY_P}.tar.gz
-	http://dev.gentoo.org/~flameeyes/${PN}/${P}-gentoo-${PATCHSET}.tar.xz"
+	https://github.com/munin-monitoring/munin/archive/${PV}.tar.gz -> ${P}.tar.gz
+	https://dev.gentoo.org/~graaff/munin/${P}-gentoo-${PATCHSET}.tar.xz"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="amd64 arm ~mips ~ppc ~x86"
-IUSE="apache asterisk cgi dhcpd doc http ipmi ipv6 irc java memcached minimal mysql postgres selinux snmp ssl syslog test"
-REQUIRED_USE="cgi? ( !minimal ) apache? ( cgi )"
+KEYWORDS="amd64 arm arm64 ppc x86"
+IUSE="apache2 asterisk doc irc java ldap memcached minimal mysql postgres selinux ssl snmp test cgi ipv6 syslog systemd ipmi http dhcpd"
+REQUIRED_USE="cgi? ( !minimal ) apache2? ( cgi )"
+RESTRICT="!test? ( test )"
 
 # Upstream's listing of required modules is NOT correct!
 # Some of the postgres plugins use DBD::Pg, while others call psql directly.
 # Some of the mysql plugins use DBD::mysql, while others call mysqladmin directly.
 # We replace the original ipmi plugins with the freeipmi_ plugin which at least works.
 DEPEND_COM="
-	dev-lang/perl[berkdb]
+	acct-user/munin
+	acct-group/munin
+	dev-lang/perl
 	dev-perl/Net-CIDR
-	dev-perl/net-server[ipv6(-)?]
+	dev-perl/Net-Server[ipv6(-)?]
+	apache2? ( www-servers/apache[apache2_modules_cgi,apache2_modules_cgid,apache2_modules_rewrite] )
 	asterisk? ( dev-perl/Net-Telnet )
-	cgi? ( dev-perl/FCGI )
-	apache? ( www-servers/apache[apache2_modules_cgi,apache2_modules_cgid,apache2_modules_rewrite] )
+	cgi? (
+		dev-perl/FCGI
+		dev-perl/CGI-Fast
+		)
 	dhcpd? (
 		>=net-misc/dhcp-3[server]
 		dev-perl/Net-IP
@@ -42,6 +47,7 @@ DEPEND_COM="
 	doc? ( dev-python/sphinx )
 	http? ( dev-perl/libwww-perl )
 	irc? ( dev-perl/Net-IRC )
+	ldap? ( dev-perl/perl-ldap )
 	kernel_linux? ( sys-process/procps )
 	memcached? ( dev-perl/Cache-Memcached )
 	mysql? (
@@ -49,36 +55,38 @@ DEPEND_COM="
 		dev-perl/Cache-Cache
 		dev-perl/DBD-mysql
 		)
-	postgres? ( dev-perl/DBD-Pg dev-db/postgresql )
+	postgres? ( dev-perl/DBD-Pg dev-db/postgresql:* )
 	ssl? ( dev-perl/Net-SSLeay )
 	syslog? ( virtual/perl-Sys-Syslog )
 	!minimal? (
-		dev-perl/DBI
-		dev-perl/File-Copy-Recursive
-		dev-perl/List-MoreUtils
-		dev-perl/Log-Log4perl
-		dev-perl/DateManip
+	dev-perl/DBI
+	dev-perl/Date-Manip
+	dev-perl/File-Copy-Recursive
+	dev-perl/List-MoreUtils
+	dev-perl/Log-Log4perl
+	dev-perl/Net-DNS
+	dev-perl/Net-Netmask
+	virtual/perl-Digest-MD5
+	virtual/perl-Getopt-Long
+	virtual/perl-MIME-Base64
+	virtual/perl-Storable
+	virtual/perl-Text-Balanced
+	virtual/perl-Time-HiRes
 		dev-perl/HTML-Template
 		dev-perl/IO-Socket-INET6
-		dev-perl/Net-Netmask
 		dev-perl/URI
-		>=net-analyzer/rrdtool-1.3[perl]
-		virtual/perl-Digest-MD5
-		virtual/perl-Getopt-Long
-		virtual/perl-MIME-Base64
-		virtual/perl-Storable
-		virtual/perl-Text-Balanced
-		virtual/perl-Time-HiRes
+		>=net-analyzer/rrdtool-1.3[graph,perl]
 		virtual/ssh
 		)
 	"
 
 # Keep this seperate, as previous versions have had other deps here
 DEPEND="${DEPEND_COM}
-	virtual/perl-Module-Build
-	java? ( >=virtual/jdk-1.5 )
+	dev-perl/Module-Build
+	java? ( >=virtual/jdk-1.8 )
 	test? (
 		dev-perl/Test-Deep
+		dev-perl/Test-Exception
 		dev-perl/Test-LongString
 		dev-perl/Test-Differences
 		dev-perl/Test-MockModule
@@ -91,30 +99,28 @@ RDEPEND="${DEPEND_COM}
 		virtual/awk
 		ipmi? ( >=sys-libs/freeipmi-1.1.6-r1 )
 		java? (
-			>=virtual/jre-1.5
-			|| ( net-analyzer/netcat6 net-analyzer/netcat )
+			>=virtual/jre-1.8:*
+			|| ( net-analyzer/netcat net-analyzer/openbsd-netcat )
 		)
 		!minimal? (
+			acct-user/munin-async
 			virtual/cron
 			media-fonts/dejavu
 		)
-		selinux? ( sec-policy/selinux-munin )
-		!<sys-apps/openrc-0.11.8"
+		selinux? ( sec-policy/selinux-munin )"
 
 S="${WORKDIR}/${MY_P}"
 
 pkg_setup() {
-	enewgroup munin
-	enewuser munin 177 -1 /var/lib/munin munin
-	if ! use minimal ;then
-		enewuser munin-async -1 /bin/sh /var/spool/munin-async
-		esethome munin-async /var/spool/munin-async
-	fi
 	java-pkg-opt-2_pkg_setup
 }
 
 src_prepare() {
-	epatch "${WORKDIR}"/patches/*.patch
+	echo ${PV} > RELEASE || die
+
+	eapply "${WORKDIR}"/patches/*.patch
+
+	eapply_user
 
 	java-pkg-opt-2_src_prepare
 }
@@ -123,9 +129,9 @@ src_configure() {
 	local cgidir='$(DESTDIR)/usr/libexec/munin/cgi'
 	use cgi || cgidir="${T}/useless/cgi-bin"
 
-	local cgiuser=$(usex apache apache munin)
+	local cgiuser=$(usex apache2 apache munin)
 
-	cat >> "${S}"/Makefile.config <<- EOF
+	cat >> "${S}"/Makefile.config <<- EOF || die
 	PREFIX=\$(DESTDIR)/usr
 	CONFDIR=\$(DESTDIR)/etc/munin
 	DOCDIR=${T}/useless/doc
@@ -139,13 +145,10 @@ src_configure() {
 	DBDIRNODE=\$(DESTDIR)/var/lib/munin-node
 	SPOOLDIR=\$(DESTDIR)/var/spool/munin-async
 	LOGDIR=\$(DESTDIR)/var/log/munin
-	PERLSITELIB=$(perl -V:vendorlib | cut -d"'" -f2)
+	PERLLIB=\$(DESTDIR)$(perl -V:vendorlib | cut -d"'" -f2)
 	JCVALID=$(usex java yes no)
 	STATEDIR=\$(DESTDIR)/run/munin
 	EOF
-
-	sed -i 's,CONFDIR)/static,DESTDIR)/var/www/munin/static,' Makefile || die
-	sed -i 's,CONFDIR)/templates,DESTDIR)/var/www/munin/templates,' Makefile || die
 }
 
 # parallel make and install need to be fixed before, and I haven't
@@ -172,6 +175,8 @@ src_install() {
 	local dirs="
 		/var/log/munin
 		/var/lib/munin/plugin-state
+		/var/lib/munin-node/plugin-state
+		/var/www/localhost/htdocs/munin
 		/etc/munin/plugin-conf.d
 		/etc/munin/plugins"
 	use minimal || dirs+=" /etc/munin/munin-conf.d/"
@@ -181,7 +186,7 @@ src_install() {
 
 	# parallel install doesn't work and it's also pointless to have this
 	# run in parallel for now (because it uses internal loops).
-	emake -j1 DESTDIR="${D}" $(usex minimal install-minimal install)
+	emake -j1 CHOWN=true DESTDIR="${D}" $(usex minimal "install-minimal install-man" install)
 
 	# we remove /run from the install, as it's not the package's to deal
 	# with.
@@ -197,19 +202,29 @@ src_install() {
 	newinitd "${FILESDIR}"/munin-node_init.d_2.0.19 munin-node
 	newconfd "${FILESDIR}"/munin-node_conf.d_1.4.6-r2 munin-node
 
-	if ! use minimal;then
+	if ! use minimal ;then
 		newinitd "${FILESDIR}"/munin-asyncd.init.2 munin-asyncd
+	else
 		rmdir $"${D}"/var/spool/munin-async || die
+		rmdir $"${D}"/var/spool/ || die
 	fi
 
-	dodir /usr/$(get_libdir)/tmpfiles.d
-	cat - > "${D}"/usr/$(get_libdir)/tmpfiles.d/${CATEGORY}:${PN}:${SLOT}.conf <<EOF
-d /run/munin 0700 munin munin - -
-EOF
+	newtmpfiles - ${CATEGORY}:${PN}:${SLOT}.conf <<-EOF || die
+	d /run/munin 0700 munin munin - -
+	EOF
 
-	cat - >> "${T}"/munin.env <<EOF
-CONFIG_PROTECT=/var/spool/munin-async/.ssh
-EOF
+	if ! use minimal && use systemd ;then
+		systemd_dounit "${FILESDIR}"/munin-async.service
+		systemd_dounit "${FILESDIR}"/munin-graph.{service,socket}
+		systemd_dounit "${FILESDIR}"/munin-html.{service,socket}
+	fi
+	if use systemd ;then
+		systemd_dounit "${FILESDIR}"/munin-node.service
+	fi
+
+	cat >> "${T}"/munin.env <<- EOF
+	CONFIG_PROTECT=/var/spool/munin-async/.ssh
+	EOF
 	newenvd "${T}"/munin.env 50munin
 
 	dodoc README ChangeLog INSTALL
@@ -219,12 +234,12 @@ EOF
 		dodoc -r *
 		cd "${S}" || die
 	else
-		rm "${D}"/usr/bin/munindoc || die
+		rm -f "${D}"/usr/bin/munindoc || die
 	fi
 
 	dodir /etc/logrotate.d/
-	sed -e "s:@CGIUSER@:$(usex apache apache munin):g" \
-		"${FILESDIR}"/logrotate.d-munin.2 > "${D}"/etc/logrotate.d/munin || die
+	sed -e "s:@CGIUSER@:$(usex apache2 apache munin):g" \
+		"${FILESDIR}"/logrotate.d-munin.3 > "${D}"/etc/logrotate.d/munin
 
 	dosym ipmi_ /usr/libexec/munin/plugins/ipmi_sensor_
 
@@ -254,12 +269,8 @@ EOF
 		# This requires the presence of munin-update, which is part of
 		# the non-minimal install...
 		rm "${D}"/usr/libexec/munin/plugins/munin_stats
+		rm "${D}"/usr/sbin/munin-sched
 	else
-		dodir /usr/$(get_libdir)/tmpfiles.d
-		cat - > "${D}"/usr/$(get_libdir)/tmpfiles.d/${CATEGORY}:${PN}:${SLOT}.conf <<EOF
-d /run/munin 0700 munin munin - -
-EOF
-
 		# remove font files so that we don't have to keep them around
 		rm "${D}"/usr/libexec/${PN}/*.ttf || die
 
@@ -268,16 +279,14 @@ EOF
 
 			keepdir /var/cache/munin-cgi
 			touch "${D}"/var/log/munin/munin-cgi-{graph,html}.log
-			fowners $(usex apache apache munin) \
+			fowners $(usex apache2 apache munin) \
 				/var/cache/munin-cgi \
 				/var/log/munin/munin-cgi-{graph,html}.log
 
-			if use apache; then
+			if use apache2; then
 				insinto /etc/apache2/vhosts.d
 				newins "${FILESDIR}"/munin.apache.include munin.include
 				newins "${FILESDIR}"/munin.apache.include-2.4 munin-2.4.include
-				sed -i 's,/etc/munin/static,/var/www/munin/static,' "${D}"//etc/apache2/vhosts.d/munin.include || die
-				sed -i 's,/etc/munin/templates,/var/www/munin/templates,' "${D}"//etc/apache2/vhosts.d/munin.include || die
 			fi
 		else
 			sed \
@@ -296,63 +305,63 @@ EOF
 
 		dodir /usr/share/${PN}
 		cat >> "${D}"/usr/share/${PN}/crontab <<- EOF
-# Force the shell to bash
-SHELL=/bin/bash
-# Mail reports to root@, not munin@
-MAILTO=root
+		# Force the shell to bash
+		SHELL=/bin/bash
+		# Mail reports to root@, not munin@
+		MAILTO=root
 
-# This runs the munin task every 5 minutes.
-*/5	* * * *		/usr/bin/munin-cron
+		# This runs the munin task every 5 minutes.
+		*/5	* * * *		/usr/bin/munin-cron
 
-# Alternatively, this route works differently
-# Update once a minute (for busy sites)
-#*/1 * * * *		/usr/libexec/munin/munin-update
-## Check for limit excess every 2 minutes
-#*/2 * * * *		/usr/libexec/munin/munin-limits
-## Update graphs every 5 minutes
-#*/5 * * * *		nice /usr/libexec/munin/munin-graph
-## Update HTML pages every 15 minutes
-#*/15 * * * *		nice /usr/libexec/munin/munin-html
-EOF
+		# Alternatively, this route works differently
+		# Update once a minute (for busy sites)
+		#*/1 * * * *		/usr/libexec/munin/munin-update
+		## Check for limit excess every 2 minutes
+		#*/2 * * * *		/usr/libexec/munin/munin-limits
+		## Update graphs every 5 minutes
+		#*/5 * * * *		nice /usr/libexec/munin/munin-graph
+		## Update HTML pages every 15 minutes
+		#*/15 * * * *		nice /usr/libexec/munin/munin-html
+		EOF
 
 		cat >> "${D}"/usr/share/${PN}/fcrontab <<- EOF
-# Mail reports to root@, not munin@, only execute one at a time
-!mailto(root),serial(true)
+		# Mail reports to root@, not munin@, only execute one at a time
+		!mailto(root),serial(true)
 
-# This runs the munin task every 5 minutes.
-@ 5		/usr/bin/munin-cron
+		# This runs the munin task every 5 minutes.
+		@ 5		/usr/bin/munin-cron
 
-# Alternatively, this route works differently
-# Update once a minute (for busy sites)
-#@ 1	/usr/libexec/munin/munin-update
-## Check for limit excess every 2 minutes
-#@ 2	/usr/libexec/munin/munin-limits
-## Update graphs every 5 minutes
-#@ 5	nice /usr/libexec/munin/munin-graph
-## Update HTML pages every 15 minutes
-#@ 15	nice /usr/libexec/munin/munin-html
-EOF
-
-		# remove .htaccess file
-		find "${D}" -name .htaccess -delete || die
+		# Alternatively, this route works differently
+		# Update once a minute (for busy sites)
+		#@ 1	/usr/libexec/munin/munin-update
+		## Check for limit excess every 2 minutes
+		#@ 2	/usr/libexec/munin/munin-limits
+		## Update graphs every 5 minutes
+		#@ 5	nice /usr/libexec/munin/munin-graph
+		## Update HTML pages every 15 minutes
+		#@ 15	nice /usr/libexec/munin/munin-html
+		EOF
 	fi
-#	if use minimal; then
-#		rm -r "${D}"/usr/libexec/munin/plugins/node.d/{aix,darwin,hp-ux,sunos,freebsd} || die
-#	fi
+
 	if ! use snmp ;then
 		rm "${D}"/usr/libexec/munin/plugins/snmp__* || die
 	fi
 	if ! use postgres ;then
 		rm "${D}"/usr/libexec/munin/plugins/postgres_* || die
+		rm "${D}"/usr/libexec/munin/plugins/slony_* || die
+		rm "${D}"/usr/libexec/munin/plugins/pgbouncer_* || die
 	fi
 	if ! use dhcpd ;then
 		rm "${D}"/usr/libexec/munin/plugins/dhcpd3 || die
 	fi
-	if ! use asterisk ;then
-		rm "${D}"/usr/libexec/munin/plugins/asterisk_* || die
-	fi
+	#if ! use asterisk ;then
+	#	rm "${D}"/usr/libexec/munin/plugins/asterisk_* || die
+	#fi
 	if ! use ipmi ;then
 		rm "${D}"/usr/libexec/munin/plugins/ipmi* || die
+	fi
+	if ! use ldap ;then
+		rm "${D}"/usr/libexec/munin/plugins/slapd* || die
 	fi
 	if ! use memcached ;then
 		rm "${D}"/usr/libexec/munin/plugins/memcached* || die
@@ -360,7 +369,16 @@ EOF
 	if ! use mysql ;then
 		rm "${D}"/usr/libexec/munin/plugins/mysql* || die
 	fi
+	if ! use selinux ;then
+		rm "${D}"/usr/libexec/munin/plugins/selinux* || die
+	fi
+
+		# remove .htaccess file
+		find "${D}" -name .htaccess -delete || die
+
+	#nothing here anymore, remove it
 	if [ -e "${D}"/var/www/localhost/htdocs/munin/ ];then
+		rm "${D}"/var/www/localhost/htdocs/munin/.keep_net-analyzer_munin-0
 		rmdir "${D}"/var/www/localhost/htdocs/munin/ || die
 	fi
 	if [ -e "${D}"/var/www/localhost/htdocs/ ];then
@@ -368,11 +386,6 @@ EOF
 	fi
 	if [ -e "${D}"/var/www/localhost/ ];then
 		rmdir "${D}"/var/www/localhost/ || die
-	fi
-	if [ -e "${D}"/etc/munin/munin.conf ];then
-	#TODO template (conf) et static (apache include)
-		sed -i 's,^#tmpldir.*,tmpldir /var/www/munin/templates,' "${D}"/etc/munin/munin.conf || die
-		sed -i 's,^#staticdir.*,staticdir /var/www/munin/static,' "${D}"/etc/munin/munin.conf || die
 	fi
 }
 
@@ -401,8 +414,12 @@ pkg_config() {
 	read
 
 	# generate one rsa (for legacy) and one ecdsa (for new systems)
-	ssh-keygen -t rsa -f /var/lib/munin/.ssh/id_rsa -N '' -C "created by portage for ${CATEGORY}/${PN}" || die
-	ssh-keygen -t ecdsa -f /var/lib/munin/.ssh/id_ecdsa -N '' -C "created by portage for ${CATEGORY}/${PN}" || die
+	ssh-keygen -t rsa \
+		-f /var/lib/munin/.ssh/id_rsa -N '' \
+		-C "created by portage for ${CATEGORY}/${PN}" || die
+	ssh-keygen -t ecdsa \
+		-f /var/lib/munin/.ssh/id_ecdsa -N '' \
+		-C "created by portage for ${CATEGORY}/${PN}" || die
 	chown -R munin:munin /var/lib/munin/.ssh || die
 	chmod 0600 /var/lib/munin/.ssh/id_{rsa,ecdsa} || die
 
@@ -415,6 +432,8 @@ pkg_config() {
 }
 
 pkg_postinst() {
+	tmpfiles_process ${CATEGORY}:${PN}:${SLOT}.conf
+
 	elog "Please follow the munin documentation to set up the plugins you"
 	elog "need, afterwards start munin-node."
 	elog ""
@@ -432,11 +451,11 @@ pkg_postinst() {
 	elog "in the Gentoo Wiki: https://wiki.gentoo.org/wiki/Munin"
 
 	if use cgi; then
-		chown $(usex apache apache munin) \
+		chown $(usex apache2 apache munin) \
 			"${ROOT}"/var/cache/munin-cgi \
 			"${ROOT}"/var/log/munin/munin-cgi-{graph,html}.log
 
-		if use apache; then
+		if use apache2; then
 			elog "To use Munin with CGI you should include /etc/apache2/vhosts.d/munin.include"
 			elog "or /etc/apache2/vhosts.d/munin-2.4.include (for Apache 2.4) from the virtual"
 			elog "host you want it to be served."
