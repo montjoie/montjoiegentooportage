@@ -1,11 +1,11 @@
-# Copyright 1999-2020 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=7
 
 PATCHSET=1
 
-inherit eutils java-pkg-opt-2 systemd
+inherit eutils java-pkg-opt-2 systemd tmpfiles
 
 MY_P=${P/_/-}
 
@@ -83,7 +83,7 @@ DEPEND_COM="
 # Keep this seperate, as previous versions have had other deps here
 DEPEND="${DEPEND_COM}
 	dev-perl/Module-Build
-	java? ( >=virtual/jdk-1.5 )
+	java? ( >=virtual/jdk-1.8 )
 	test? (
 		dev-perl/Test-Deep
 		dev-perl/Test-Exception
@@ -99,7 +99,7 @@ RDEPEND="${DEPEND_COM}
 		virtual/awk
 		ipmi? ( >=sys-libs/freeipmi-1.1.6-r1 )
 		java? (
-			>=virtual/jre-1.5
+			>=virtual/jre-1.8:*
 			|| ( net-analyzer/netcat net-analyzer/openbsd-netcat )
 		)
 		!minimal? (
@@ -131,7 +131,7 @@ src_configure() {
 
 	local cgiuser=$(usex apache2 apache munin)
 
-	cat >> "${S}"/Makefile.config <<- EOF
+	cat >> "${S}"/Makefile.config <<- EOF || die
 	PREFIX=\$(DESTDIR)/usr
 	CONFDIR=\$(DESTDIR)/etc/munin
 	DOCDIR=${T}/useless/doc
@@ -209,8 +209,7 @@ src_install() {
 		rmdir $"${D}"/var/spool/ || die
 	fi
 
-	dodir /usr/$(get_libdir)/tmpfiles.d
-	cat > "${D}"/usr/$(get_libdir)/tmpfiles.d/${CATEGORY}:${PN}:${SLOT}.conf <<- EOF
+	newtmpfiles - ${CATEGORY}:${PN}:${SLOT}.conf <<-EOF || die
 	d /run/munin 0700 munin munin - -
 	EOF
 
@@ -355,9 +354,9 @@ src_install() {
 	if ! use dhcpd ;then
 		rm "${D}"/usr/libexec/munin/plugins/dhcpd3 || die
 	fi
-	if ! use asterisk ;then
-		rm "${D}"/usr/libexec/munin/plugins/asterisk_* || die
-	fi
+	#if ! use asterisk ;then
+	#	rm "${D}"/usr/libexec/munin/plugins/asterisk_* || die
+	#fi
 	if ! use ipmi ;then
 		rm "${D}"/usr/libexec/munin/plugins/ipmi* || die
 	fi
@@ -433,6 +432,8 @@ pkg_config() {
 }
 
 pkg_postinst() {
+	tmpfiles_process ${CATEGORY}:${PN}:${SLOT}.conf
+
 	elog "Please follow the munin documentation to set up the plugins you"
 	elog "need, afterwards start munin-node."
 	elog ""
