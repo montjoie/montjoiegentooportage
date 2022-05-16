@@ -5,8 +5,8 @@ EAPI=8
 
 inherit autotools
 
-DESCRIPTION=""General Stream I/O
-HOMEPAGE=""https://github.com/cminyard/gensio
+DESCRIPTION="General Stream I/O"
+HOMEPAGE="https://github.com/cminyard/gensio"
 if [[ "${PV}" != "9999" ]];
 then
 	SRC_URI=""
