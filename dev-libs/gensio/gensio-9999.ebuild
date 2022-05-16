@@ -17,13 +17,18 @@ else
 	KEYWORDS=""
 fi
 
+IUSE="openipmi openssl python swig"
+
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS=""
 
-DEPEND=""
+DEPEND="
+	openipmi? ( sys-libs/openipmi )
+	openssl? ( dev-libs/openssl )
+	"
 RDEPEND="${DEPEND}"
-BDEPEND=""
+BDEPEND="${DEPEND}"
 
 src_prepare() {
 	default
@@ -31,13 +36,11 @@ src_prepare() {
 }
 
 src_configure() {
-	econf
-	return
-	mycmakeargs=(
-		"-DENABLE_PYTHON=OFF"
-		"-DENABLE_SWIG=OFF"
-		)
-
+	econf \
+		$(use_with openipmi) \
+		$(use_with openssl) \
+		$(use_with python) \
+		$(use_with swig)
 }
 
 src_compile() {
