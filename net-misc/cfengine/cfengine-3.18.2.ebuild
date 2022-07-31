@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/net-misc/cfengine/cfengine-3.3.9.ebuild,v 1.1 2012/10/27 15:42:36 idl0r Exp $
 
-EAPI="5"
+EAPI="7"
 
 inherit eutils
 
@@ -92,12 +92,15 @@ src_install() {
 	# find it. Most hosts cache their copy of the cfengine
 	# binaries here. This is the default search location for the
 	# binaries.
+	dodir /usr/sbin/
 	for bin in promises agent monitord serverd execd runagent key; do
-		dosym /usr/sbin/cf-$bin /var/cfengine/bin/cf-$bin || die
+		#mv "${D}"/usr/bin/cf-$bin "${D}"/usr/sbin/cf-$bin || die
+		dosym /usr/bin/cf-$bin /var/cfengine/bin/cf-$bin || die
 	done
+	#dosym /usr/bin/cf-promises /usr/sbin/cf-promises || die
 
 	#No need for that
-	rm "${D}"/usr/sbin/rpmvercmp || die
+	rm "${D}"/usr/bin/rpmvercmp || die
 
 	if use html; then
 		docinto html
@@ -106,8 +109,6 @@ src_install() {
 }
 
 pkg_postinst() {
-	echo
-	elog "NOTE: BDB (BerkelyDB) support has been removed as of ${PN}-3.3.0"
 	echo
 	einfo "Init scripts for cf-serverd, cf-monitord, and cf-execd are provided."
 	einfo
