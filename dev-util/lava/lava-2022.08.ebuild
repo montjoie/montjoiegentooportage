@@ -21,6 +21,7 @@ fi
 PATCHES="
 	${FILESDIR}/yaml_load-2019.10.patch
 	${FILESDIR}/pkg-version.patch
+	${FILESDIR}/remove_junit-2022.08.patch
 	"
 
 #TODO feature check for NFS LXC
@@ -39,9 +40,9 @@ RDEPEND="${DEPEND}
 		<dev-python/django-3[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-1.21.2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
-		dev-python/django-rest-framework[${PYTHON_USEDEP}]
+		>=dev-python/django-rest-framework-3.12.1[${PYTHON_USEDEP}]
 		dev-python/django-rest-framework-filters[${PYTHON_USEDEP}]
-		<dev-python/django-rest-framework-extensions-0.5.0[${PYTHON_USEDEP}]
+		>=dev-python/django-rest-framework-extensions-0.6.0[${PYTHON_USEDEP}]
 		<dev-python/django-filter-2.6[${PYTHON_USEDEP}]
 		dev-python/django-environ[${PYTHON_USEDEP}]
 		dev-python/psycopg[${PYTHON_USEDEP}]
