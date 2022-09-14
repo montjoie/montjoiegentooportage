@@ -21,6 +21,7 @@ DEPEND="dev-libs/libpcre
 		net-dns/c-ares
 	)
 	ldap? ( net-nds/openldap )
+	net-libs/libtirpc
 	sys-apps/findutils
 	sys-apps/grep
 	sys-apps/net-tools
@@ -68,6 +69,10 @@ src_prepare() {
 	sed -i 's,@XYMONLOGDIR@/xymonlaunch.pid,/run/xymond/xymonlaunch.pid,' xymond/xymon.sh.DIST || die
 	sed -i 's,--pidfile=.*/xymond.pid,--pidfile=/run/xymond/xymond.pid,' xymond/etcfiles/tasks.cfg.DIST || die
 	sed -i 's,--pidfile=$XYMONSERVERLOGS,--pidfile=/run/xymond/,' xymond/etcfiles/tasks.cfg.DIST || die
+
+	#sed -i 's,-x,-e,' build/fping.sh || die
+	echo "#!/bin/sh
+exit 0" > build/fping.sh
 
 	default
 }
