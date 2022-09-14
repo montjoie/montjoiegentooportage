@@ -5,7 +5,7 @@ EAPI="7"
 
 DISTUTILS_USE_SETUPTOOLS=rdepend
 MYPV="${PV/_beta/b}"
-PYTHON_COMPAT=( python3_9 )
+PYTHON_COMPAT=( python3_{9..10} )
 
 inherit bash-completion-r1 distutils-r1 optfeature
 
@@ -25,11 +25,11 @@ IUSE="examples"
 #RESTRICT="!test? ( test )"
 RESTRICT="test" # 'celery' not found in `markers` configuration option
 
+#	>=dev-python/click-7[${PYTHON_USEDEP}]
+#	<dev-python/click-8[${PYTHON_USEDEP}]
 RDEPEND="
 	>=dev-python/billiard-3.6.4.0[${PYTHON_USEDEP}]
 	<dev-python/billiard-4.0.0[${PYTHON_USEDEP}]
-	>=dev-python/click-7[${PYTHON_USEDEP}]
-	<dev-python/click-8[${PYTHON_USEDEP}]
 	<dev-python/kombu-6.0[${PYTHON_USEDEP}]
 	>=dev-python/kombu-5[${PYTHON_USEDEP}]
 	dev-python/pytz[${PYTHON_USEDEP}]
