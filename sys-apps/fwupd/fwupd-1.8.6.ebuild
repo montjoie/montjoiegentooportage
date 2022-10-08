@@ -122,6 +122,7 @@ src_configure() {
 	#   parade_lspcon, pixart_rf, realtek_mst, scsi, redfish, upower
 	local plugins=(
 		-Dplugin_gpio="enabled"
+		-Dplugin_nitrokey="enabled"
 		$(meson_feature amt plugin_amt)
 		$(meson_feature dell plugin_dell)
 		$(meson_feature fastboot plugin_fastboot)
@@ -148,7 +149,6 @@ src_configure() {
 		-Dconsolekit="disabled"
 		-Dcurl="enabled"
 		-Defi_binary="false"
-		-Dgresource_quirks="disabled"
 		-Dsupported_build="enabled"
 		-Dudevdir="${EPREFIX}$(get_udevdir)"
 		$(meson_feature archive libarchive)
