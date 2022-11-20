@@ -3,7 +3,7 @@
 
 EAPI=7
 
-PYTHON_COMPAT=( python3_{6,7,8,9} pypy )
+PYTHON_COMPAT=( python3_{9,10} pypy )
 
 inherit distutils-r1
 
