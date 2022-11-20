@@ -4,7 +4,7 @@
 EAPI=7
 
 PYTHON_REQ_USE="sqlite"
-PYTHON_COMPAT=( python3_{8,9} )
+PYTHON_COMPAT=( python3_{9,10} )
 inherit autotools distutils-r1 user
 
 DESCRIPTION="LAVA"
@@ -21,44 +21,46 @@ fi
 PATCHES="
 	${FILESDIR}/yaml_load-2019.10.patch
 	${FILESDIR}/pkg-version.patch
-	${FILESDIR}/qemu-version.patch
-	${FILESDIR}/remove_junit.patch
+	${FILESDIR}/remove_junit-2022.08.patch
 	"
 
 #TODO feature check for NFS LXC
 
+distutils_enable_tests pytest
+
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="apache2 dispatcher doc docker ldap lxc nbd nfs qemu master screen telnet tftp xnbd"
+IUSE="apache2 dispatcher doc docker ldap lxc nbd nfs qemu master screen telnet test tftp"
 
 DEPEND=""
 RDEPEND="${DEPEND}
 	master? ( dev-db/postgresql )
 	master? (
+		dev-python/celery[${PYTHON_USEDEP}]
 		<dev-python/django-3[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-1.21.2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
-		dev-python/django-rest-framework[${PYTHON_USEDEP}]
+		>=dev-python/django-rest-framework-3.12.1[${PYTHON_USEDEP}]
 		dev-python/django-rest-framework-filters[${PYTHON_USEDEP}]
-		<dev-python/django-rest-framework-extensions-0.5.0[${PYTHON_USEDEP}]
-		dev-python/django-filter[${PYTHON_USEDEP}]
+		>=dev-python/django-rest-framework-extensions-0.6.0[${PYTHON_USEDEP}]
+		<dev-python/django-filter-2.6[${PYTHON_USEDEP}]
 		dev-python/django-environ[${PYTHON_USEDEP}]
 		dev-python/psycopg[${PYTHON_USEDEP}]
+		dev-python/py-amqp[${PYTHON_USEDEP}]
 		dev-python/tappy[${PYTHON_USEDEP}]
 		dev-python/whitenoise[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
 	)
 	ldap? ( dev-python/django-auth-ldap )
 	apache2? ( www-servers/apache )
-	docker? ( app-emulation/docker )
+	docker? ( app-containers/docker )
 	lxc? ( app-emulation/lxc )
 	nbd? ( sys-block/nbd )
 	nfs? ( net-fs/nfs-utils )
 	screen? ( app-misc/screen )
 	telnet? ( net-misc/telnet-bsd )
-	xnbd? ( sys-block/xnbd )
 	dev-python/simplejson[${PYTHON_USEDEP}]
-	dev-python/pyyaml[libyaml]
+	dev-python/pyyaml
 	dev-python/jinja[${PYTHON_USEDEP}]
 	dev-python/pexpect[${PYTHON_USEDEP}]
 	dev-python/voluptuous[${PYTHON_USEDEP}]
@@ -96,7 +98,7 @@ pkg_pretend() {
 		done
 	fi
 	if ! use dispatcher;then
-		for duse in qemu nfs lxc nbd screen telnet xnbd
+		for duse in qemu nfs lxc nbd screen telnet
 		do
 			if use $duse;then
 				ewarn "USE $duse is useless without dispatcher"
@@ -162,10 +164,10 @@ src_install() {
 		dodir /usr/share/lava-server/device-types/
 		mv "${D}/etc/lava-server/dispatcher-config/device-types/"* "${D}/usr/share/lava-server/device-types/"
 
-		ln -s "/usr/$(get_libdir)/$EPYTHON/site-packages/django/contrib/admin/static/admin/" "${D}/usr/share/lava-server/static/admin" || die
-		ln -s "/usr/$(get_libdir)/$EPYTHON/site-packages/lava_server/static/lava_server" "${D}/usr/share/lava-server/static/lava_server" || die
-		ln -s "/usr/$(get_libdir)/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app" "${D}/usr/share/lava-server/static/lava_scheduler_app" || die
-		ln -s /"usr/$(get_libdir)/$EPYTHON/site-packages/lava_results_app/static/lava_results_app" "${D}/usr/share/lava-server/static/lava_results_app" || die
+		ln -s "/usr/lib/$EPYTHON/site-packages/django/contrib/admin/static/admin/" "${D}/usr/share/lava-server/static/admin" || die
+		ln -s "/usr/lib/$EPYTHON/site-packages/lava_server/static/lava_server" "${D}/usr/share/lava-server/static/lava_server" || die
+		ln -s "/usr/lib/$EPYTHON/site-packages/lava_scheduler_app/static/lava_scheduler_app" "${D}/usr/share/lava-server/static/lava_scheduler_app" || die
+		ln -s /"usr/lib/$EPYTHON/site-packages/lava_results_app/static/lava_results_app" "${D}/usr/share/lava-server/static/lava_results_app" || die
 
 		if ! use ldap;then
 			sed -i 's,import ldap,,' "${D}/usr/lib/$EPYTHON/site-packages/lava_scheduler_app/utils.py"
