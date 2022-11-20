@@ -21,7 +21,6 @@ IUSE="openipmi openssl python swig"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS=""
 
 DEPEND="
 	openipmi? ( sys-libs/openipmi )
