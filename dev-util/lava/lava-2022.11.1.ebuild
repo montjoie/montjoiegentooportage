@@ -4,7 +4,7 @@
 EAPI=7
 
 PYTHON_REQ_USE="sqlite"
-PYTHON_COMPAT=( python3_{10} )
+PYTHON_COMPAT=( python3_{10,11} )
 inherit autotools distutils-r1 user
 
 DESCRIPTION="LAVA"
@@ -46,7 +46,7 @@ RDEPEND="${DEPEND}
 		>=dev-python/django-rest-framework-extensions-0.6.0[${PYTHON_USEDEP}]
 		<dev-python/django-filter-2.6[${PYTHON_USEDEP}]
 		dev-python/django-environ[${PYTHON_USEDEP}]
-		dev-python/psycopg[${PYTHON_USEDEP}]
+		dev-python/psycopg:2[${PYTHON_USEDEP}]
 		dev-python/py-amqp[${PYTHON_USEDEP}]
 		dev-python/tappy[${PYTHON_USEDEP}]
 		dev-python/whitenoise[${PYTHON_USEDEP}]
