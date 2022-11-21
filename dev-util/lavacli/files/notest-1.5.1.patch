@@ -1,0 +1,10 @@
+--- a/setup.py.old	2022-11-21 15:23:18.334147722 +0100
++++ b/setup.py	2022-11-21 15:23:26.030133892 +0100
+@@ -60,7 +60,5 @@
+     packages=["lavacli", "lavacli.commands"],
+     entry_points={"console_scripts": ["lavacli = lavacli:main"]},
+     install_requires=["aiohttp", "jinja2", "pyzmq", "requests", "ruamel.yaml"],
+-    setup_requires=["pytest-runner"],
+-    tests_require=["pytest"],
+     zip_safe=True,
+ )
