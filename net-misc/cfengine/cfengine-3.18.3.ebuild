@@ -4,7 +4,7 @@
 
 EAPI="7"
 
-inherit eutils
+inherit autotools eutils
 
 MY_PV="${PV//_beta/b}"
 MY_PV="${MY_PV/_p/p}"
@@ -18,7 +18,7 @@ LICENSE="GPL-3"
 SLOT="3"
 KEYWORDS="amd64 arm arm64 ~ppc ~sparc x86"
 
-IUSE="acl curl examples html libvirt lmdb mysql postgres +qdbm selinux tests tokyocabinet vim-syntax yaml xml"
+IUSE="acl curl examples html libvirt lmdb mysql postgres +qdbm selinux server tests tokyocabinet vim-syntax yaml xml"
 
 DEPEND="
 	mysql? ( virtual/mysql )
@@ -43,11 +43,16 @@ REQUIRED_USE="qdbm? ( !tokyocabinet )
 
 S="${WORKDIR}/${MY_P}"
 
+PATCHES=(
+	"${FILESDIR}"/libntech-xml2.patch
+)
 src_prepare() {
 	default
 
 	sed -i "s,/sbin/ifconfig,`which /bin/ifconfig`,g" libenv/unix_iface.c || die
 	sed -i "s,/bin/getent,/usr/bin/getent,g" libpromises/unix.c || die
+
+	eautoreconf
 }
 
 src_configure() {
@@ -70,7 +75,6 @@ src_configure() {
 }
 
 src_install() {
-	newinitd "${FILESDIR}"/cf-serverd.rc6 cf-serverd || die
 	newinitd "${FILESDIR}"/cf-monitord.rc6 cf-monitord || die
 	newinitd "${FILESDIR}"/cf-execd.rc6 cf-execd || die
 
@@ -94,11 +98,14 @@ src_install() {
 	# binaries here. This is the default search location for the
 	# binaries.
 	dodir /usr/sbin/
-	for bin in promises agent monitord serverd execd runagent key; do
+	for bin in promises agent monitord execd runagent key; do
 		#mv "${D}"/usr/bin/cf-$bin "${D}"/usr/sbin/cf-$bin || die
 		dosym /usr/bin/cf-$bin /var/cfengine/bin/cf-$bin || die
 	done
-	#dosym /usr/bin/cf-promises /usr/sbin/cf-promises || die
+	if use server; then
+		newinitd "${FILESDIR}"/cf-serverd.rc6 cf-serverd || die
+		dosym /usr/bin/cf-serverd /var/cfengine/bin/cf-serverd
+	fi
 
 	#No need for that
 	rm "${D}"/usr/bin/rpmvercmp || die
