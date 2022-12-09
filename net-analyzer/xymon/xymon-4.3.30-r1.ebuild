@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit eutils user
+inherit eutils
 
 DESCRIPTION="Xymon is a tool for monitoring servers, applications and networks."
 HOMEPAGE="http://www.xymon.com"
@@ -14,13 +14,15 @@ SLOT="0"
 KEYWORDS="amd64 arm arm64 x86"
 IUSE="apache2 fping ldap ssl +server"
 
-DEPEND="dev-libs/libpcre
+DEPEND="acct-user/xymon
+	dev-libs/libpcre
 	ssl? ( dev-libs/openssl:0= )
 	fping? ( net-analyzer/fping[suid] )
 	server? ( net-analyzer/rrdtool
 		net-dns/c-ares
 	)
 	ldap? ( net-nds/openldap )
+	net-libs/libtirpc
 	sys-apps/findutils
 	sys-apps/grep
 	sys-apps/net-tools
@@ -58,7 +60,7 @@ src_prepare() {
 	einfo "Remove bundled c-ares"
 #	cp xymonnet/Makefile xymonnet/Makefile.orig || die
 #	epatch "${FILESDIR}"/use_system_c-ares.patch || die
-	rm xymonnet/c-ares-1.12.0.tar.gz || die
+	rm xymonnet/c-ares-*.tar.gz || die
 
 	# fix pid locations
 	sed -i 's,\(xymond.pid.*\)xgetenv("XYMONSERVERLOGS"),\1"/run/xymond/",' xymond/xymond.c || die
@@ -68,6 +70,10 @@ src_prepare() {
 	sed -i 's,@XYMONLOGDIR@/xymonlaunch.pid,/run/xymond/xymonlaunch.pid,' xymond/xymon.sh.DIST || die
 	sed -i 's,--pidfile=.*/xymond.pid,--pidfile=/run/xymond/xymond.pid,' xymond/etcfiles/tasks.cfg.DIST || die
 	sed -i 's,--pidfile=$XYMONSERVERLOGS,--pidfile=/run/xymond/,' xymond/etcfiles/tasks.cfg.DIST || die
+
+	#sed -i 's,-x,-e,' build/fping.sh || die
+	echo "#!/bin/sh
+exit 0" > build/fping.sh
 
 	default
 }
@@ -204,7 +210,7 @@ src_install() {
 		fowners -R xymon:xymon /usr/xymon/server/www/ || die
 
 		touch "${D}"/etc/xymon/cookies.session || die
-		fowners xymon:apache /etc/xymon/cookies.session || die
+		fowners xymon:xymon /etc/xymon/cookies.session || die
 		fperms 640 /etc/xymon/cookies.session || die
 
 		if use apache2 ; then

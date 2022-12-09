@@ -3,7 +3,7 @@
 
 EAPI="7"
 
-inherit linux-info flag-o-matic systemd udev user tmpfiles
+inherit linux-info flag-o-matic systemd udev tmpfiles
 
 DESCRIPTION="APC UPS daemon with integrated tcp/ip remote shutdown"
 HOMEPAGE="http://www.apcupsd.org/"
@@ -15,6 +15,7 @@ KEYWORDS="amd64 ~arm ppc x86"
 IUSE="snmp +usb +modbus cgi gnome kernel_linux"
 
 DEPEND=">=sys-apps/util-linux-2.23[tty-helpers(-)]
+	acct-user/apcupsd
 	cgi? ( >=media-libs/gd-1.8.4 )
 	modbus? ( usb? ( virtual/libusb:0 ) )
 	gnome? (
@@ -47,8 +48,6 @@ pkg_setup() {
 	if use kernel_linux && use usb && linux_config_exists ; then
 		check_extra_config
 	fi
-	enewgroup apcupsd || die
-	enewuser apcupsd -1 -1 / apcupsd || die
 }
 
 src_configure() {
