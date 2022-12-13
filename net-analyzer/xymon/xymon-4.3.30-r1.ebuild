@@ -31,12 +31,6 @@ DEPEND="acct-user/xymon
 RDEPEND="${DEPEND}
 	!net-analyzer/xymon-client"
 
-pkg_setup() {
-	GROUP="xymon"
-	enewgroup xymon || die
-	enewuser xymon -1 -1 /usr/xymon/home $GROUP || die
-}
-
 src_prepare() {
 	cp "${S}"/web/showgraph.c "${S}"/web/showgraph.c.orig || die
 	cp "${S}/web/history.c" "${S}/web/history.c.orig" || die
