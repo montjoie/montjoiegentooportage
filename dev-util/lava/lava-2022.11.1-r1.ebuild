@@ -4,8 +4,8 @@
 EAPI=7
 
 PYTHON_REQ_USE="sqlite"
-PYTHON_COMPAT=( python3_{9,10} )
-inherit autotools distutils-r1 user
+PYTHON_COMPAT=( python3_{10,11} )
+inherit autotools distutils-r1
 
 DESCRIPTION="LAVA"
 HOMEPAGE="https://validation.linaro.org"
@@ -34,9 +34,12 @@ IUSE="apache2 dispatcher doc docker ldap lxc nbd nfs qemu master screen telnet t
 
 DEPEND=""
 RDEPEND="${DEPEND}
+	acct-user/lava
+	acct-group/lava
 	master? ( dev-db/postgresql )
 	master? (
 		dev-python/celery[${PYTHON_USEDEP}]
+		dev-python/defusedxml[${PYTHON_USEDEP}]
 		<dev-python/django-3[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-1.21.2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
@@ -45,7 +48,7 @@ RDEPEND="${DEPEND}
 		>=dev-python/django-rest-framework-extensions-0.6.0[${PYTHON_USEDEP}]
 		<dev-python/django-filter-2.6[${PYTHON_USEDEP}]
 		dev-python/django-environ[${PYTHON_USEDEP}]
-		dev-python/psycopg[${PYTHON_USEDEP}]
+		dev-python/psycopg:2[${PYTHON_USEDEP}]
 		dev-python/py-amqp[${PYTHON_USEDEP}]
 		dev-python/tappy[${PYTHON_USEDEP}]
 		dev-python/whitenoise[${PYTHON_USEDEP}]
@@ -60,7 +63,7 @@ RDEPEND="${DEPEND}
 	screen? ( app-misc/screen )
 	telnet? ( net-misc/telnet-bsd )
 	dev-python/simplejson[${PYTHON_USEDEP}]
-	dev-python/pyyaml
+	dev-python/pyyaml[${PYTHON_USEDEP}]
 	dev-python/jinja[${PYTHON_USEDEP}]
 	dev-python/pexpect[${PYTHON_USEDEP}]
 	dev-python/voluptuous[${PYTHON_USEDEP}]
@@ -113,11 +116,6 @@ src_prepare() {
 	#find ${S} -name '__pycache__' -type f | xargs rm -v
 }
 
-pkg_setup() {
-	enewgroup lavaserver
-	enewuser lavaserver -1 -1 /var/lib/lava-server/home lavaserver
-}
-
 src_compile() {
 	if use doc;then
 		emake html -C doc/v2/
@@ -132,7 +130,7 @@ src_install() {
 	#python_foreach_impl python_fix_shebang ${D}/usr/
 	#distutils-r1_python_install
 	# HACK
-	EPYTHON=python3.9
+	EPYTHON=python3.10
 	$EPYTHON setup.py install --root="${D}"
 
 	if use master;then
