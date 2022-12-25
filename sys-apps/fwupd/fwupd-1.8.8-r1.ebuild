@@ -84,7 +84,6 @@ COMMON_DEPEND="${PYTHON_DEPS}
 "
 RDEPEND="
 	${COMMON_DEPEND}
-	sys-apps/dbus
 "
 
 DEPEND="
