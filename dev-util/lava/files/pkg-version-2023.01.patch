@@ -1,0 +1,27 @@
+diff --git a/lava_common/utils.py b/lava_common/utils.py
+index 7327f5a18..24ea53bae 100644
+--- a/lava_common/utils.py
++++ b/lava_common/utils.py
+@@ -80,10 +80,12 @@ def debian_package_version(pkg):
+     Use dpkg-query to retrieve the version of the given package.
+     Distributions not derived from Debian will return an empty string.
+     """
++    if pkg == 'lava-server' or pkg == 'lava-dispatcher':
++        pkg = "lava"
+     with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError):
+         return (
+             subprocess.check_output(  # nosec dpkg-query
+-                ("dpkg-query", "-W", "-f=${Version}\n", "%s" % pkg),
++                ("equery", "-q", "l", "--format='$fullversion'", "%s" % pkg),
+                 stderr=subprocess.STDOUT,
+             )
+             .strip()
+@@ -104,7 +106,7 @@ def debian_filename_version(binary):
+     with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError):
+         pkg_str = (
+             subprocess.check_output(  # nosec dpkg-query
+-                ("dpkg-query", "-S", binary), stderr=subprocess.STDOUT
++                ("equery", "-q", "l", "--format='$fullversion'", "lava"), stderr=subprocess.STDOUT
+             )
+             .strip()
+             .decode("utf-8", errors="replace")

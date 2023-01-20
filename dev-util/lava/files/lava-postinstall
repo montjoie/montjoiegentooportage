@@ -14,6 +14,8 @@ if ! su postgres -c "psql -c \"SELECT datname FROM pg_database WHERE datname='$L
 	su postgres -c "createdb --port $LAVA_DB_PORT --locale=C --encoding=UTF-8 --owner=$LAVA_DB_USER --template=template0 --no-password $LAVA_DB_NAME" || exit $?
 fi
 
+lava-server manage makemigrations
+
 # fake-initial only in django 1.8 but needed for upgrades from 1.7 using 1.9
 #    if [ "`dpkg --compare-versions $(django-admin --version) gt '1.8' && echo $?`" = '0' ]; then
         lava-server manage migrate --noinput --fake-initial
