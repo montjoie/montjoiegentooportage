@@ -105,6 +105,8 @@ src_install() {
 	if use server; then
 		newinitd "${FILESDIR}"/cf-serverd.rc6 cf-serverd || die
 		dosym /usr/bin/cf-serverd /var/cfengine/bin/cf-serverd
+	else
+		rm "${D}"/usr/bin/cf-serverd
 	fi
 
 	#No need for that
