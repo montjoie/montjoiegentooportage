@@ -3,6 +3,8 @@
 
 EAPI=7
 
+inherit autotools
+
 DESCRIPTION="Atari ST and Amiga music player"
 HOMEPAGE="http://sc68.atari.org/"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
@@ -18,7 +20,11 @@ DEPEND="debug? ( sys-libs/readline )
 RDEPEND="${DEPEND}"
 
 src_prepare() {
+	#eapply "${FILESDIR}"/info.patch
+	sed -i 's,$(ECHO),echo,' info/Makefile.am
 	eapply "${FILESDIR}"/doc.patch
+	eapply "${FILESDIR}"/readline.patch
+	eautoreconf
 	default
 }
 
