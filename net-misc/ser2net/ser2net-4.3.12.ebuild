@@ -12,7 +12,8 @@ SLOT="4"
 LICENSE="GPL-2"
 
 DEPEND="
-	dev-libs/gensio"
+	dev-libs/gensio
+	dev-libs/libyaml"
 RDEPEND="${DEPEND}"
 
 src_install () {
