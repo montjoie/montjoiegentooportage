@@ -5,7 +5,7 @@ EAPI="7"
 
 DISTUTILS_USE_SETUPTOOLS=rdepend
 MYPV="${PV/_beta/b}"
-PYTHON_COMPAT=( python3_{9..10} )
+PYTHON_COMPAT=( python3_{9..11} )
 
 inherit bash-completion-r1 distutils-r1 optfeature
 
