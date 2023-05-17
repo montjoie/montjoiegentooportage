@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit autotools linux-info
+inherit autotools epatch linux-info
 
 DESCRIPTION="Linux Kernel Crypto API User Space Interface Library"
 HOMEPAGE="http://www.chronox.de/libkcapi.html"
@@ -17,7 +17,7 @@ else
 	KEYWORDS=""
 fi
 
-LICENSE="GPL"
+LICENSE="GPL-2"
 SLOT="0"
 IUSE="doc rngtool"
 
@@ -38,6 +38,7 @@ src_prepare() {
 src_configure() {
 	econf --enable-kcapi-test=yes \
 		$(use_enable rngtool kcapi-rngapp) \
+		--enable-kcapi-encapp \
 		--enable-kcapi-speed=yes
 }
 
