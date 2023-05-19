@@ -22,7 +22,9 @@ SLOT="0"
 KEYWORDS="amd64 arm arm64 x86"
 IUSE=""
 
-DEPEND="dev-ml/ocamlbuild"
+DEPEND="dev-ml/ocamlbuild
+	dev-ml/findlib
+	app-arch/cpio"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
