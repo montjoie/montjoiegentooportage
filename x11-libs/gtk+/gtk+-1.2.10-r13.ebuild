@@ -24,13 +24,13 @@ MY_AVAILABLE_LINGUAS=" az ca cs da de el es et eu fi fr ga gl hr hu it ja ko lt 
 IUSE="${IUSE} ${MY_AVAILABLE_LINGUAS// / linguas_}"
 
 RDEPEND=">=dev-libs/glib-1.2.10-r6:1[${MULTILIB_USEDEP}]
+	x11-libs/libX11
+	x11-base/xorg-proto
 	>=x11-libs/libX11-1.5.0-r1[${MULTILIB_USEDEP}]
 	>=x11-libs/libXext-1.3.1-r1[${MULTILIB_USEDEP}]
 	>=x11-libs/libXi-1.7.2[${MULTILIB_USEDEP}]
 	>=x11-libs/libXt-1.1.4[${MULTILIB_USEDEP}]"
 DEPEND="${RDEPEND}
-	>=x11-proto/inputproto-2.2-r1[${MULTILIB_USEDEP}]
-	>=x11-proto/xextproto-7.2.1-r1[${MULTILIB_USEDEP}]
 	nls? ( sys-devel/gettext dev-util/intltool )"
 
 MULTILIB_CHOST_TOOLS=(/usr/bin/gtk-config)
@@ -54,9 +54,6 @@ src_prepare() {
 	epatch "${FILESDIR}"/${P}-as-needed.patch
 	sed -i '/libtool.m4/,/AM_PROG_NM/d' acinclude.m4 #168198
 	epatch "${FILESDIR}"/${P}-automake-1.13.patch #467520
-	pwd
-	ls -l
-	#rm configure.in
 	eautoreconf
 	gnome2_src_prepare
 }
@@ -95,7 +92,7 @@ multilib_src_install_all() {
 	docinto docs
 	cd docs
 	dodoc *.txt *.gif text/*
-	dohtml -r html
+	#dohtml -r html
 
 	#install nice, clean-looking gtk+ style
 	insinto /usr/share/themes/Gentoo/gtk
