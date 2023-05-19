@@ -45,6 +45,7 @@ src_prepare() {
 
 	# build failure with automake-1.13
 	epatch "${FILESDIR}/${P}-automake-1.13.patch"
+	epatch "${FILESDIR}/${P}-inline.patch"
 
 	sed -i 's,__const__,,' glib.h
 

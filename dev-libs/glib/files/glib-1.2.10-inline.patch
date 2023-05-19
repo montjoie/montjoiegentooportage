@@ -1,0 +1,19 @@
+--- glib-1.2/glib.h.old	2023-05-20 08:52:08.450939377 +0200
++++ glib-1.2/glib.h	2023-05-20 09:22:59.956252794 +0200
+@@ -181,6 +181,7 @@
+ #ifndef G_INLINE_FUNC
+ #  define G_CAN_INLINE 1
+ #endif
++#undef __OPTIMIZE__
+ #ifdef G_HAVE_INLINE
+ #  if defined (__GNUC__) && defined (__STRICT_ANSI__)
+ #    undef inline
+@@ -204,7 +205,7 @@
+ #ifndef G_INLINE_FUNC
+ #  ifdef __GNUC__
+ #    ifdef __OPTIMIZE__
+-#      define G_INLINE_FUNC extern inline
++#      define G_INLINE_FUNC extern inline __attribute__ ((__gnu_inline__)
+ #    else
+ #      undef G_CAN_INLINE
+ #      define G_INLINE_FUNC extern
