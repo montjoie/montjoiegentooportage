@@ -24,6 +24,14 @@ RDEPEND=""
 
 MULTILIB_CHOST_TOOLS=(/usr/bin/glib-config)
 
+epatch() {
+	echo "PATCH $1"
+	patch --batch -p1 < $1
+	if [ $? -ne 0 ];then
+		patch --batch -p0 < $1 || exit $?
+	fi
+}
+
 src_prepare() {
 	epatch "${FILESDIR}"/${P}-automake.patch
 	epatch "${FILESDIR}"/${P}-m4.patch
@@ -33,10 +41,12 @@ src_prepare() {
 	epatch "${FILESDIR}"/${P}-gcc34-fix.patch
 
 	# Fix for -Wl,--as-needed (bug #133818)
-	epatch "${DISTDIR}"/glib-1.2.10-r1-as-needed.patch.bz2
+	epatch "${FILESDIR}"/glib-1.2.10-r1-as-needed.patch
 
 	# build failure with automake-1.13
 	epatch "${FILESDIR}/${P}-automake-1.13.patch"
+
+	sed -i 's,__const__,,' glib.h
 
 	use ppc64 && use hardened && replace-flags -O[2-3] -O1
 	sed -i "/libglib_la_LDFLAGS/i libglib_la_LIBADD = $(dlopen_lib)" Makefile.am || die
@@ -75,5 +85,5 @@ multilib_src_install() {
 
 multilib_src_install_all() {
 	einstalldocs
-	dohtml -r docs
+	#dohtml -r docs
 }
