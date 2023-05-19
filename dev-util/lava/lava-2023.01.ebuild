@@ -129,7 +129,7 @@ src_install() {
 	#python_foreach_impl python_fix_shebang ${D}/usr/
 	#distutils-r1_python_install
 	# HACK
-	EPYTHON=python3.10
+	EPYTHON=$(eselect python show)
 	$EPYTHON setup.py install --root="${D}"
 
 	if use master;then
@@ -198,7 +198,7 @@ src_install() {
 		fi
 	else
 		einfo "Clean unused master files"
-		EPYTHON=python3.9
+		EPYTHON=$(eselect python show)
 		rm -r "${D}/usr/$(get_libdir)/$EPYTHON/site-packages/lava_server/"
 		rm -r "${D}/usr/$(get_libdir)/$EPYTHON/site-packages/linaro_django_xmlrpc/"
 		rm -r "${D}/usr/$(get_libdir)/$EPYTHON/site-packages/linaro_scheduler/"
