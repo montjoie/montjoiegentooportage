@@ -3,6 +3,7 @@
 
 EAPI=8
 
+DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{9..11} )
 inherit distutils-r1 optfeature
 
@@ -52,6 +53,13 @@ EPYTEST_IGNORE=(
 	# AttributeError: test_Etcd instance has no attribute 'patch'
 	t/unit/transport/test_etcd.py
 )
+
+src_prepare()
+{
+	rm requirements/test.txt
+	sed -i 's,.*tests_require.*,,' setup.py
+	default
+}
 
 python_install_all() {
 	if use examples; then
