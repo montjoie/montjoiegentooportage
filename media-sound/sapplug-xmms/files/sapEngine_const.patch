@@ -1,5 +1,5 @@
---- saplib/sapEngine.cpp.orig	2011-06-17 14:43:46.000000000 +0200
-+++ saplib/sapEngine.cpp	2011-06-17 14:43:50.000000000 +0200
+--- a/saplib/sapEngine.cpp.orig	2011-06-17 14:43:46.000000000 +0200
++++ b/saplib/sapEngine.cpp	2011-06-17 14:43:50.000000000 +0200
 @@ -116,7 +116,7 @@
  					if( i==0 )
  						continue;
