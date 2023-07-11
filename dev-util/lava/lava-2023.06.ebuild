@@ -20,7 +20,6 @@ fi
 
 PATCHES="
 	${FILESDIR}/pkg-version-2023.01.patch
-	${FILESDIR}/remove_junit-2023.01.patch
 	"
 
 #TODO feature check for NFS LXC
@@ -33,13 +32,13 @@ IUSE="apache2 dispatcher doc docker ldap lxc nbd nfs qemu master screen telnet t
 
 DEPEND=""
 RDEPEND="${DEPEND}
-	acct-user/lava
-	acct-group/lava
+	acct-user/lavaserver
+	acct-group/lavaserver
 	master? ( dev-db/postgresql )
 	master? (
 		dev-python/celery[${PYTHON_USEDEP}]
 		dev-python/defusedxml[${PYTHON_USEDEP}]
-		dev-python/django[${PYTHON_USEDEP}]
+		<dev-python/django-3[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-1.21.2[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		>=dev-python/django-rest-framework-3.12.1[${PYTHON_USEDEP}]
