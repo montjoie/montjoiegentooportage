@@ -8,7 +8,8 @@ inherit distutils-r1
 
 DESCRIPTION="Django app allowing declarative dynamic QuerySet filtering from URL parameters"
 HOMEPAGE="https://github.com/carltongibson/django-filter"
-SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
+#SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
+SRC_URI="https://github.com/carltongibson/${PN}/archive/refs/tags/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
