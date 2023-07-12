@@ -20,6 +20,7 @@ fi
 
 PATCHES="
 	${FILESDIR}/pkg-version-2023.01.patch
+	${FILESDIR}/remove_junit-2023.06.patch
 	"
 
 #TODO feature check for NFS LXC

@@ -20,6 +20,7 @@ fi
 
 PATCHES="
 	${FILESDIR}/pkg-version-2023.01.patch
+	${FILESDIR}/remove_junit-2023.06.patch
 	"
 
 #TODO feature check for NFS LXC
@@ -187,7 +188,7 @@ src_install() {
 		dodir /var/lib/lava-server/default/media/
 		keepdir /var/lib/lava-server/default/media/
 		fowners -R lavaserver:lavaserver /var/lib/lava-server/default/
-		dobin "${FILESDIR}/lava-postinstall"
+		#dobin "${FILESDIR}/lava-postinstall"
 
 		if use doc;then
 			dodir /usr/share/lava-server/static/docs/
@@ -233,7 +234,7 @@ pkg_postinst() {
 	fi
 
 	if use master;then
-		einfo "On the first install, simply run lava-postinstall"
+		einfo "On the first install, simply run /usr/share/lava-server/postinst.py"
 		einfo "Create an admin account with lava-server manage users add --passwd adminpassword --staff --superuser admin"
 		einfo "Then you can add workers via lavacli"
 		einfo "Dont forget to add ALLOWED_HOSTS in /etc/lava-server/settings.conf"
