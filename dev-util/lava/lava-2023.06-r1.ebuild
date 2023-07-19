@@ -88,6 +88,7 @@ RDEPEND="${DEPEND}
 		dev-python/pyserial[${PYTHON_USEDEP}]
 		dev-python/pyudev[${PYTHON_USEDEP}]
 		dev-python/python-magic[${PYTHON_USEDEP}]
+		dev-python/sentry-sdk[${PYTHON_USEDEP}]
 	)"
 
 pkg_pretend() {
