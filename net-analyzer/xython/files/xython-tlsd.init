@@ -3,8 +3,8 @@
 # Distributed under the terms of the GNU General Public License v2
 
 command="/usr/bin/xython-tlsdd"
-#command_args="--etcdir /etc/xython/ -D --wwwdir /var/lib/xython/www"
-start_stop_daemon_args="--background --make-pidfile --user xython:xython"
+PIDFILE="/run/xython-tlsd.pid"
+start_stop_daemon_args="--background --make-pidfile --user xython:xython --pidfile ${PIDFILE}"
 
 depend() {
 	need localmount net

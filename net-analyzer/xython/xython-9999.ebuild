@@ -57,6 +57,21 @@ src_install() {
 		#doins etc/hosts.cfg
 		doins etc/xython.cfg
 		doins etc/xymonmenu.cfg
+
+		keepdir var/lib/xython
+		keepdir var/lib/xython/acks
+		keepdir var/lib/xython/data
+		keepdir var/lib/xython/hostdata
+		keepdir var/lib/xython/logs
+		keepdir var/lib/xython/www
+		keepdir var/lib/xython/hist
+		keepdir var/lib/xython/histlogs
+		keepdir var/lib/xython/disabled
+		keepdir var/lib/xython/rrd
+		keepdir var/lib/xython/tmp
+
+		fowners -R xython:xython /var/lib/xython
+
 		newinitd "${FILESDIR}"/xythond.init xythond
 		newinitd "${FILESDIR}"/xython-tlsd.init xython-tlsd
 		newinitd "${FILESDIR}"/xython-celery.init xython-celery
