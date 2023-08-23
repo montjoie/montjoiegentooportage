@@ -70,7 +70,12 @@ src_install() {
 		keepdir var/lib/xython/rrd
 		keepdir var/lib/xython/tmp
 
+		dodir /var/log/xython
+		keepdir var/log/xython
+
 		fowners -R xython:xython /var/lib/xython
+		fowners -R xython:xython /var/log/xython
+		fowners -R :xython /etc/xython
 
 		newinitd "${FILESDIR}"/xythond.init xythond
 		newinitd "${FILESDIR}"/xython-tlsd.init xython-tlsd
