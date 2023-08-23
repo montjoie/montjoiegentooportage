@@ -4,7 +4,7 @@
 
 command="/usr/bin/xython-client-looper.sh"
 PIDFILE="/run/xython-client.pid"
-start_stop_daemon_args="--user xython:xython --background --make-pidfile --pidfile ${PIDFILE}"
+start_stop_daemon_args="--background --make-pidfile --pidfile ${PIDFILE}"
 
 depend() {
 	need localmount net
