@@ -18,7 +18,7 @@ else
 	KEYWORDS="amd64 arm arm64 x86"
 fi
 
-LICENSE="GPL"
+LICENSE="GPL-2"
 SLOT="0"
 IUSE="server"
 
@@ -57,6 +57,9 @@ src_install() {
 		#doins etc/hosts.cfg
 		doins etc/xython.cfg
 		doins etc/xymonmenu.cfg
+		newinitd "${FILESDIR}"/xythond.init xythond
+		newinitd "${FILESDIR}"/xython-tlsd.init xython-tlsd
+		newinitd "${FILESDIR}"/xython-celery.init xython-celery
 	fi
 
 	newinitd "${FILESDIR}"/xython-client.init xython-client

@@ -2,8 +2,9 @@
 # Copyright 1999-2023 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-command="/usr/bin/xython-client-looper.sh"
-start_stop_daemon_args="--user xython:xython --background --make-pidfile"
+command="/usr/bin/xythond"
+command_args="--etcdir /etc/xython/ -D --wwwdir /var/lib/xython/www"
+start_stop_daemon_args="--background --make-pidfile --user xython:xython"
 
 depend() {
 	need localmount net
