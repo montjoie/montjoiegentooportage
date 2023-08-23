@@ -1,0 +1,31 @@
+#!/sbin/openrc-run
+# Copyright 1999-2023 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+command="/usr/bin/xython-client-looper.sh"
+start_stop_daemon_args=""
+description="Daemon for xython client"
+: ${NAME:="xython client"}
+
+depend() {
+	need localmount net
+	use logger
+}
+
+if [ "${RC_VERSION:-0}" = "0" ]; then
+	start() {
+		eerror "This script cannot be used for baselayout-1."
+		return 1
+	}
+fi
+
+start() {
+	ebegin "Starting $NAME"
+		start-stop-daemon --user xython:xython --start $start_stop_daemon_args --exec $command -- start $options
+	eend $?
+}
+stop() {
+	ebegin "Stopping $NAME"
+		start-stop-daemon --user xython:xython --stop $start_stop_daemon_args --exec $command -- stop
+	eend $RET
+}
