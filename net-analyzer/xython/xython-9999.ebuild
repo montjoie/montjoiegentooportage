@@ -25,11 +25,16 @@ IUSE="apache2 server"
 DEPEND="server? (
 	acct-user/xython
 	dev-python/celery
+	dev-python/redis
 	dev-python/requests
+	dev-python/click-didyoumean
+	dev-python/click-plugins
+	dev-python/click-repl
 	dev-python/pytz
 	)"
 RDEPEND="
 	apache2? ( www-servers/apache )
+	server? ( dev-db/redis )
 	${DEPEND}"
 
 src_prepare() {

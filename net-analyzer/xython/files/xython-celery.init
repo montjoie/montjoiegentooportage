@@ -8,6 +8,6 @@ PIDFILE="/run/xython-celery.pid"
 start_stop_daemon_args="--background --make-pidfile --user xython:xython --pidfile ${PIDFILE}"
 
 depend() {
-	need localmount net
+	need localmount net redis
 	use logger
 }
