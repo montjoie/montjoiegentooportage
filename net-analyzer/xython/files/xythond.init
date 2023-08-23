@@ -12,3 +12,8 @@ depend() {
 	use logger
 }
 
+checkconfig() {
+	if [ ! -d "/run/xython" ] ; then
+		checkpath -d --owner xython /run/xython
+	fi
+}

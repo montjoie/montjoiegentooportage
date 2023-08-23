@@ -20,7 +20,7 @@ fi
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="server"
+IUSE="apache2 server"
 
 DEPEND="server? (
 	acct-user/xython
@@ -28,7 +28,9 @@ DEPEND="server? (
 	dev-python/requests
 	dev-python/pytz
 	)"
-RDEPEND="${DEPEND}"
+RDEPEND="
+	apache2? ( www-servers/apache )
+	${DEPEND}"
 
 src_prepare() {
 	default
@@ -80,6 +82,10 @@ src_install() {
 		newinitd "${FILESDIR}"/xythond.init xythond
 		newinitd "${FILESDIR}"/xython-tlsd.init xython-tlsd
 		newinitd "${FILESDIR}"/xython-celery.init xython-celery
+		if use apache2; then
+			insinto /etc/apache2/vhosts.d
+			newins ${S}/etc/apache2/xython.conf xython.include
+		fi
 	fi
 
 	newinitd "${FILESDIR}"/xython-client.init xython-client
