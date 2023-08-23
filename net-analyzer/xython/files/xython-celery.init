@@ -11,3 +11,9 @@ depend() {
 	need localmount net redis
 	use logger
 }
+
+stop() {
+	ebegin "Stopping ${SVCNAME}"
+	start-stop-daemon --stop --pidfile "${PIDFILE}"
+	eend $?
+}

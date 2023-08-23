@@ -16,3 +16,9 @@ checkconfig() {
 		checkpath -d --owner xython /run/xython
 	fi
 }
+
+stop() {
+	ebegin "Stopping ${SVCNAME}"
+	start-stop-daemon --stop --pidfile "${PIDFILE}"
+	eend $?
+}
