@@ -1,11 +1,11 @@
 # Copyright 1999-2022 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
 PATCHSET=1
 
-inherit eutils java-pkg-opt-2 systemd tmpfiles
+inherit java-pkg-opt-2 systemd tmpfiles
 
 MY_P=${P/_/-}
 
