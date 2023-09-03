@@ -11,6 +11,7 @@
 		<name>Gentoo Sysadmin Project</name>
 	</maintainer>
 	<use>
+		<flag name="server">Install non-client binaries (aka cf-serverd)</flag>
 		<flag name="html">Install HTML documentation</flag>
 		<flag name="libvirt">Enable support for virtual machine management through <pkg>app-emulation/libvirt</pkg></flag>
 		<flag name="lmdb">Use <pkg>dev-db/lmdb</pkg> as database backend</flag>
