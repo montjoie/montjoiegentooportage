@@ -2,9 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/net-misc/cfengine/cfengine-3.3.9.ebuild,v 1.1 2012/10/27 15:42:36 idl0r Exp $
 
-EAPI="7"
+EAPI=8
 
-inherit autotools eutils
+inherit autotools
 
 MY_PV="${PV//_beta/b}"
 MY_PV="${MY_PV/_p/p}"
