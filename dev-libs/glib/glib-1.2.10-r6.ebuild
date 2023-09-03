@@ -6,7 +6,7 @@ EAPI=7
 GNOME_TARBALL_SUFFIX="gz"
 GNOME2_LA_PUNT="yes"
 
-inherit autotools eutils gnome2 libtool flag-o-matic portability multilib-minimal
+inherit autotools gnome2 libtool flag-o-matic portability multilib-minimal
 
 DESCRIPTION="The GLib library of C routines"
 HOMEPAGE="http://www.gtk.org/"
