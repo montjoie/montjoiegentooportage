@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit eutils
+#inherit eutils
 
 DESCRIPTION="SAP plug in for xmms"
 HOMEPAGE="http://asma.atari.org/bin/"
