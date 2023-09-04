@@ -7,7 +7,7 @@ EAPI=7
 GNOME_TARBALL_SUFFIX="gz"
 GNOME2_LA_PUNT="yes"
 
-inherit autotools eutils flag-o-matic gnome2 toolchain-funcs multilib-minimal
+inherit autotools flag-o-matic gnome2 toolchain-funcs multilib-minimal
 
 DESCRIPTION="The GIMP Toolkit"
 HOMEPAGE="http://www.gtk.org/"
