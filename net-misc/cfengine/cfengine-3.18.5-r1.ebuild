@@ -28,7 +28,7 @@ DEPEND="
 	lmdb? ( dev-db/lmdb )
 	qdbm? ( dev-db/qdbm )
 	libvirt? ( app-emulation/libvirt )
-	<dev-libs/openssl-3
+	dev-libs/openssl
 	dev-libs/libpcre
 	yaml? ( dev-libs/libyaml )
 	xml? ( dev-libs/libxml2 )
