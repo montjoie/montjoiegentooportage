@@ -18,8 +18,8 @@ KEYWORDS="amd64 arm ~arm64 ~x86"
 IUSE="examples"
 
 RDEPEND="
-	>=dev-python/py-amqp-5.0.9[${PYTHON_USEDEP}]
-	<dev-python/py-amqp-6.0.0[${PYTHON_USEDEP}]
+	>=dev-python/amqp-5.0.9[${PYTHON_USEDEP}]
+	<dev-python/amqp-6.0.0[${PYTHON_USEDEP}]
 	dev-python/vine[${PYTHON_USEDEP}]
 "
 BDEPEND="
