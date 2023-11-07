@@ -48,7 +48,7 @@ RDEPEND="${DEPEND}
 		>dev-python/django-filter-2.4[${PYTHON_USEDEP}]
 		dev-python/django-environ[${PYTHON_USEDEP}]
 		dev-python/psycopg:2[${PYTHON_USEDEP}]
-		dev-python/py-amqp[${PYTHON_USEDEP}]
+		dev-python/amqp[${PYTHON_USEDEP}]
 		dev-python/tappy[${PYTHON_USEDEP}]
 		dev-python/whitenoise[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
