@@ -40,6 +40,7 @@ RDEPEND="
 src_prepare() {
 	default
 	cmake_src_prepare
+	sed -i "s,^CLIENTVERSION=.*,CLIENTVERSION=$PV," $S/client/xython-client
 }
 
 src_configure() {

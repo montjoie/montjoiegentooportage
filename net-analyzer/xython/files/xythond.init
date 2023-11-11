@@ -12,7 +12,7 @@ depend() {
 	use logger
 }
 
-checkconfig() {
+start_pre() {
 	if [ ! -d "/run/xython" ] ; then
 		checkpath -d --owner xython -m 0775 /run/xython
 	fi
