@@ -6,6 +6,12 @@ command="/usr/bin/xython-client-looper.sh"
 PIDFILE="/run/xython-client.pid"
 start_stop_daemon_args="--background --make-pidfile --pidfile ${PIDFILE}"
 
+checkconfig() {
+	if [ ! -d "/run/xython-client" ] ; then
+		checkpath -d -m 0775 /run/xython-client
+	fi
+}
+
 depend() {
 	need localmount net
 	use logger
