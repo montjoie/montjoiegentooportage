@@ -31,6 +31,7 @@ DEPEND="server? (
 	dev-python/click-plugins
 	dev-python/click-repl
 	dev-python/pytz
+	net-analyzer/netcat
 	)"
 RDEPEND="
 	apache2? ( www-servers/apache )
