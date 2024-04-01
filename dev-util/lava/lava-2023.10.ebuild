@@ -84,7 +84,6 @@ RDEPEND="${DEPEND}
 			)
 		dev-python/aiohttp[${PYTHON_USEDEP}]
 		dev-python/configobj[${PYTHON_USEDEP}]
-		dev-python/nose[${PYTHON_USEDEP}]
 		dev-python/pyserial[${PYTHON_USEDEP}]
 		dev-python/pyudev[${PYTHON_USEDEP}]
 		dev-python/python-magic[${PYTHON_USEDEP}]
