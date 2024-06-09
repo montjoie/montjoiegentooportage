@@ -1,9 +1,7 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-
-inherit eutils
+EAPI=7
 
 DESCRIPTION="Xymon is a tool for monitoring servers, applications and networks."
 HOMEPAGE="http://www.xymon.com"
@@ -31,11 +29,14 @@ DEPEND="acct-user/xymon
 RDEPEND="${DEPEND}
 	!net-analyzer/xymon-client"
 
+PATCHES=(
+	"${FILESDIR}"/history.patch
+	"${FILESDIR}"/logfetch.patch
+)
+
 src_prepare() {
 	cp "${S}"/web/showgraph.c "${S}"/web/showgraph.c.orig || die
 	cp "${S}/web/history.c" "${S}/web/history.c.orig" || die
-	epatch "${FILESDIR}"/history.patch || die
-	epatch "${FILESDIR}"/logfetch.patch || die
 #	find -name *.c | xargs sed -i 's,static char rcsid,static const char rcsid,' || die
 	if ! use ldap ; then
 		rm build/test-ldap.c || die
@@ -67,7 +68,7 @@ src_prepare() {
 
 	#sed -i 's,-x,-e,' build/fping.sh || die
 	echo "#!/bin/sh
-exit 0" > build/fping.sh
+" > build/fping.sh
 
 	default
 }
