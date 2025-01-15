@@ -4,7 +4,7 @@
 
 command="/usr/bin/munin-node-python"
 PIDFILE="/run/munin-node-python.pid"
-start_stop_daemon_args="--background --make-pidfile --pidfile ${PIDFILE} -- --netport 4949"
+start_stop_daemon_args="--background --make-pidfile --pidfile ${PIDFILE} -- -D --netport 4949"
 
 depend() {
 	need localmount net
