@@ -38,14 +38,14 @@ src_install() {
 
 	insinto /usr/libexec/munin/plugins
 	doins plugins/*
-	doins munin/plugins/node.d/df.in
-	doins munin/plugins/node.d/df_inode.in
-	doins munin/plugins/node.d.linux/cpu.in
-	doins munin/plugins/node.d.linux/if_.in
-	doins munin/plugins/node.d.linux/memory.in
-	doins munin/plugins/node.d.linux/uptime.in
-	doins munin/plugins/plugin.sh.in
-	mv $D/usr/libexec/munin/plugins/plugin.sh.in $D/usr/libexec/munin/plugins/plugin.sh
+	newins munin/plugins/node.d/df.in df_
+	newins munin/plugins/node.d/df_inode.in df_inode_
+	newins munin/plugins/node.d.linux/cpu.in cpu
+	newins munin/plugins/node.d.linux/if_.in if_
+	newins munin/plugins/node.d.linux/memory.in memory
+	newins munin/plugins/node.d.linux/uptime.in uptime
+	newins munin/plugins/plugin.sh.in plugin.sh
+	chmod +x $D/usr/libexec/munin/plugins/*
 
 	sed -i 's,@@BASH@@,/bin/bash,' $D/usr/libexec/munin/plugins/*
 	sed -i 's,@@GOODSH@@,/bin/sh,' $D/usr/libexec/munin/plugins/*
