@@ -5,7 +5,7 @@ EAPI=7
 
 DESCRIPTION="Xymon is a tool for monitoring servers, applications and networks."
 HOMEPAGE="http://www.xymon.com"
-SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
+SRC_URI="https://sourceforge.net/projects/xymon/files/Xymon//${PV}/${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
