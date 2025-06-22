@@ -2,6 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
+DISTUTILS_USE_PEP517=setuptools
 PYTHON_COMPAT=( python3_{10,11,12,13} )
 inherit cmake distutils-r1
 
@@ -22,7 +23,10 @@ LICENSE="GPL-2"
 SLOT="0"
 IUSE=""
 
-DEPEND=""
+DEPEND="
+	acct-user/munin
+	acct-group/munin
+"
 RDEPEND="${DEPEND}"
 
 src_prepare() {
@@ -48,6 +52,7 @@ src_install() {
 	#dodir /etc/munin/plugin-conf.d
 
 	#insinto /usr/libexec/munin/plugins
+	#doins
 	#doins plugins/*
 	#newins munin/plugins/node.d/df.in df_
 	#newins munin/plugins/node.d/df_inode.in df_inode_
@@ -78,5 +83,6 @@ src_install() {
 
 	keepdir /var/lib/munin/plugin-state
 	keepdir /var/log/munin-node/
+	keepdir /etc/munin/plugins
 }
 
