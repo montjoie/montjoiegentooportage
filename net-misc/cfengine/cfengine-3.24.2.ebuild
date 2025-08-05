@@ -52,6 +52,8 @@ src_prepare() {
 	sed -i "s,/sbin/ifconfig,`which /bin/ifconfig`,g" libenv/unix_iface.c || die
 	sed -i "s,/bin/getent,/usr/bin/getent,g" libpromises/unix.c || die
 
+	eapply "${FILESDIR}/gentoo.patch"
+
 	eautoreconf
 }
 
