@@ -42,7 +42,6 @@ RDEPEND="${DEPEND}
 		dev-python/defusedxml[${PYTHON_USEDEP}]
 		<dev-python/django-5[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-2.1.1[${PYTHON_USEDEP}]
-		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		>=dev-python/django-rest-framework-3.12.1[${PYTHON_USEDEP}]
 		dev-python/django-rest-framework-filters[${PYTHON_USEDEP}]
 		>=dev-python/django-rest-framework-extensions-0.6.0[${PYTHON_USEDEP}]
@@ -131,6 +130,7 @@ src_install() {
 	#distutils-r1_python_install
 	# HACK
 	EPYTHON=$(eselect python show)
+	einfo "Building with $EPYTHON"
 	$EPYTHON setup.py install --root="${D}"
 
 	if use master;then
