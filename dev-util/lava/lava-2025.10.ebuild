@@ -1,10 +1,11 @@
 # Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=7
+EAPI=8
 
+DISTUTILS_USE_PEP517=setuptools
 PYTHON_REQ_USE="sqlite"
-PYTHON_COMPAT=( python3_{10,11} )
+PYTHON_COMPAT=( python3_{10,11,12,13,14} )
 inherit autotools distutils-r1
 
 DESCRIPTION="LAVA"
@@ -20,7 +21,7 @@ fi
 
 PATCHES="
 	${FILESDIR}/pkg-version-2023.01.patch
-	${FILESDIR}/remove_junit-2023.06.patch
+	${FILESDIR}/remove_junit-2024.09.patch
 	"
 
 #TODO feature check for NFS LXC
@@ -39,7 +40,7 @@ RDEPEND="${DEPEND}
 	master? (
 		dev-python/celery[${PYTHON_USEDEP}]
 		dev-python/defusedxml[${PYTHON_USEDEP}]
-		<dev-python/django-4[${PYTHON_USEDEP}]
+		<dev-python/django-5[${PYTHON_USEDEP}]
 		>=dev-python/django-tables2-2.1.1[${PYTHON_USEDEP}]
 		dev-python/django-restricted-resource[${PYTHON_USEDEP}]
 		>=dev-python/django-rest-framework-3.12.1[${PYTHON_USEDEP}]
@@ -49,7 +50,7 @@ RDEPEND="${DEPEND}
 		dev-python/django-environ[${PYTHON_USEDEP}]
 		dev-python/psycopg:2[${PYTHON_USEDEP}]
 		dev-python/amqp[${PYTHON_USEDEP}]
-		dev-python/tappy[${PYTHON_USEDEP}]
+		dev-python/tap-py[${PYTHON_USEDEP}]
 		dev-python/whitenoise[${PYTHON_USEDEP}]
 		www-servers/gunicorn[${PYTHON_USEDEP}]
 	)
@@ -63,7 +64,7 @@ RDEPEND="${DEPEND}
 	telnet? ( net-misc/telnet-bsd )
 	dev-python/simplejson[${PYTHON_USEDEP}]
 	dev-python/pyyaml[${PYTHON_USEDEP}]
-	dev-python/jinja[${PYTHON_USEDEP}]
+	dev-python/jinja2[${PYTHON_USEDEP}]
 	dev-python/pexpect[${PYTHON_USEDEP}]
 	dev-python/voluptuous[${PYTHON_USEDEP}]
 	dev-python/netifaces[${PYTHON_USEDEP}]
@@ -239,6 +240,7 @@ pkg_postinst() {
 		einfo "Then you can add workers via lavacli"
 		einfo "Dont forget to add ALLOWED_HOSTS in /etc/lava-server/settings.conf"
 		einfo "if you upgrade LAVA, please run lava-server manage migrate (see share/postinst.py TODO)"
+		einfo "if you upgrade LAVA from version<2024.09, please run lava-server manage check_uniqueness --yes"
 	fi
 
 	if use qemu;then

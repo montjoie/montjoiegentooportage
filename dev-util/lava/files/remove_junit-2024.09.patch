@@ -1,0 +1,78 @@
+--- a/lava_rest_app/v02/views.py.old	2024-09-25 17:38:48.750956594 +0200
++++ b/lava_rest_app/v02/views.py	2024-09-25 17:39:15.695746406 +0200
+@@ -7,7 +7,6 @@
+ import csv
+ import io
+ 
+-import junit_xml
+ import tap
+ import voluptuous
+ import yaml
+@@ -142,7 +141,6 @@
+ 
+     The test results are also available in JUnit, TAP13, CSV and YAML at:
+ 
+-    * `/jobs/<job_id>/junit/`
+     * `/jobs/<job_id>/tap13/`
+     * `/jobs/<job_id>/csv/`
+     * `/jobs/<job_id>/yaml/`
+@@ -186,59 +184,6 @@
+             self.permission_classes = [IsSuperUser]
+         return super().get_permissions()
+ 
+-    @action(detail=True, suffix="junit")
+-    def junit(self, request, **kwargs):
+-        suites = []
+-        classname_prefix = request.query_params.get("classname_prefix", "")
+-        if classname_prefix != "":
+-            classname_prefix = str(classname_prefix) + "_"
+-        for suite in self.get_object().testsuite_set.all().order_by("id"):
+-            cases = []
+-            for case in suite.testcase_set.all().order_by("id"):
+-                # Grab the duration
+-                md = case.action_metadata
+-                duration = None
+-                if md is not None:
+-                    duration = md.get("duration")
+-                    if duration is not None:
+-                        duration = float(duration)
+-
+-                # Build the test case junit object
+-                tc = junit_xml.TestCase(
+-                    case.name,
+-                    elapsed_sec=duration,
+-                    classname="%s%s" % (classname_prefix, case.suite.name),
+-                    timestamp=case.logged.isoformat(),
+-                )
+-                if case.result == TestCase.RESULT_FAIL:
+-                    logs = None
+-                    # TODO: is this of any use? (yaml inside xml!)
+-                    if (
+-                        case.start_log_line is not None
+-                        and case.end_log_line is not None
+-                    ):
+-                        logs = logs_instance.read(
+-                            self.get_object(), case.start_log_line, case.end_log_line
+-                        )
+-                    tc.add_failure_info("failed", output=logs)
+-                elif case.result == TestCase.RESULT_SKIP:
+-                    tc.add_skipped_info("skipped")
+-                cases.append(tc)
+-            suites.append(
+-                junit_xml.TestSuite(
+-                    suite.name,
+-                    test_cases=cases,
+-                    timestamp=suite.get_end_datetime().isoformat(),
+-                )
+-            )
+-
+-        data = junit_xml.to_xml_report_string(suites, encoding="utf-8")
+-        response = HttpResponse(data, content_type="application/xml")
+-        response["Content-Disposition"] = (
+-            "attachment; filename=job_%d.xml" % self.get_object().id
+-        )
+-        return response
+-
+     @action(detail=True, suffix="logs")
+     def logs(self, request, **kwargs):
+         start = safe_str2int(request.query_params.get("start", 0))
