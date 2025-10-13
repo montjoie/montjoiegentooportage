@@ -8,18 +8,15 @@ PYTHON_COMPAT=( python3_{9..14} )
 
 inherit distutils-r1
 
-DESCRIPTION="Better filtering for Django REST Framework"
-HOMEPAGE="https://www.django-rest-framework.org/api-guide/filtering/#django-rest-framework-filters-package"
-SRC_URI="http://deb.debian.org/debian/pool/main/d/djangorestframework-filters/djangorestframework-filters_1.0.0.dev2.orig.tar.gz -> ${P}.tar.gz"
+DESCRIPTION="Powerful and flexible toolkit that makes it easy to build Web APIs using Django"
+HOMEPAGE="http://django-rest-framework.org/"
+SRC_URI="https://github.com/encode/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
+
 LICENSE="BSD"
 SLOT="0"
 KEYWORDS="amd64 arm x86"
 
 IUSE=""
-
-PATCHES=(
-	"${FILESDIR}/fix_url_compat_against_django4.patch"
-)
 
 RDEPEND=">=dev-python/markdown-2.6.4[${PYTHON_USEDEP}]
 	>=dev-python/pyyaml-3.10[${PYTHON_USEDEP}]
@@ -29,8 +26,6 @@ DEPEND="${RDEPEND}
 	dev-python/django[${PYTHON_USEDEP}]
 	dev-python/setuptools[${PYTHON_USEDEP}]
 "
-
-S=${WORKDIR}/django-rest-framework-filters-${PV}.dev2
 
 #RESTRICT="test"
 

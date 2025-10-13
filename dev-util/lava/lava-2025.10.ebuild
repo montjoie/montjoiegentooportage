@@ -176,6 +176,9 @@ src_install() {
 			dodir /etc/apache2/vhosts.d/
 			insinto /etc/apache2/vhosts.d/
 			doins "${S}/etc/lava-server.conf"
+			sed -i 's,${APACHE_LOG_DIR},/var/log/apache2,' ${D}/etc/apache2/vhosts.d/lava-server.conf
+			rm ${D}/etc/apache2/sites-available/lava-server.conf
+			# TODO LAVA install always in /etc/apache2/sites-available/
 		fi
 
 		# I found too ugly to install nodejs just for that

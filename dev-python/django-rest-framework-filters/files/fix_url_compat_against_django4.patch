@@ -1,0 +1,32 @@
+--- a/tests/testapp/urls.py
++++ b/tests/testapp/urls.py
+@@ -1,5 +1,5 @@
+ 
+-from django.conf.urls import include, url
++from django.urls import include, re_path
+ from rest_framework import routers
+ 
+ from . import views
+@@ -15,5 +15,5 @@
+ 
+ 
+ urlpatterns = [
+-    url(r'^', include(router.urls)),
++    re_path(r'^', include(router.urls)),
+ ]
+--- a/tests/perf/urls.py
++++ b/tests/perf/urls.py
+@@ -1,5 +1,5 @@
+ 
+-from django.conf.urls import include, url
++from django.urls import include, re_path
+ from rest_framework import routers
+ 
+ from . import views
+@@ -10,5 +10,5 @@
+ 
+ 
+ urlpatterns = [
+-    url(r'^', include(router.urls)),
++    re_path(r'^', include(router.urls)),
+ ]
