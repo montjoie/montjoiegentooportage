@@ -30,7 +30,6 @@ RESTRICT="test" # 'celery' not found in `markers` configuration option
 #	<dev-python/click-8[${PYTHON_USEDEP}]
 RDEPEND="
 	>=dev-python/billiard-3.6.4.0[${PYTHON_USEDEP}]
-	<dev-python/billiard-4.0.0[${PYTHON_USEDEP}]
 	dev-python/click[${PYTHON_USEDEP}]
 	<dev-python/kombu-6.0[${PYTHON_USEDEP}]
 	>=dev-python/kombu-5[${PYTHON_USEDEP}]
