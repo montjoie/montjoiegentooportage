@@ -1,18 +1,18 @@
-# Copyright 1999-2023 Gentoo Authors
+# Copyright 1999-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
 
-inherit gnome.org gnome2-utils meson systemd xdg
+inherit flag-o-matic gnome.org gnome2-utils meson systemd xdg
 
 DESCRIPTION="Simple document viewer for GNOME"
-HOMEPAGE="https://wiki.gnome.org/Apps/Evince"
+HOMEPAGE="https://apps.gnome.org/Evince/"
 
 LICENSE="GPL-2+ CC-BY-SA-3.0"
 # subslot = evd3.(suffix of libevdocument3)-evv3.(suffix of libevview3)
 SLOT="0/evd3.4-evv3.3"
-KEYWORDS="~alpha amd64 ~arm arm64 ~ia64 ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86 ~amd64-linux ~x86-linux ~x64-solaris"
-IUSE="cups djvu dvi gstreamer gnome keyring gtk-doc +introspection nautilus postscript spell tiff xps"
+KEYWORDS="~alpha amd64 ~arm arm64 ~loong ~ppc ~ppc64 ~riscv x86 ~x64-solaris"
+IUSE="X cups djvu dvi gstreamer gnome keyring gtk-doc +introspection postscript spell tiff xps wayland"
 REQUIRED_USE="gtk-doc? ( introspection )"
 
 # atk used in libview
@@ -21,15 +21,15 @@ DEPEND="
 	>=app-accessibility/at-spi2-core-2.46.0:2
 	>=dev-libs/glib-2.44.0:2
 	>=gui-libs/libhandy-1.5.0:1
-	>=dev-libs/libxml2-2.5:2
-	sys-libs/zlib:=
+	>=dev-libs/libxml2-2.5:2=
+	virtual/zlib:=
 	>=x11-libs/gdk-pixbuf-2.40:2
-	>=x11-libs/gtk+-3.22.0:3[cups?,introspection?]
+	>=x11-libs/gtk+-3.22.0:3[X?,cups?,introspection?,wayland?]
 	gnome-base/gsettings-desktop-schemas
 	>=x11-libs/cairo-1.10
-	>=app-text/poppler-22.02.0:=[cairo]
+	>=app-text/poppler-22.05.0:=[cairo]
 	>=app-arch/libarchive-3.6.0:=
-	djvu? ( >=app-text/djvu-3.5.22:= )
+	djvu? ( >=app-text/djvu-3.5.29:= )
 	dvi? (
 		>=app-text/libspectre-0.2:=
 		dev-libs/kpathsea:=
@@ -40,8 +40,7 @@ DEPEND="
 		media-libs/gst-plugins-good:1.0 )
 	gnome? ( gnome-base/gnome-desktop:3= )
 	keyring? ( >=app-crypt/libsecret-0.5 )
-	introspection? ( >=dev-libs/gobject-introspection-1:= )
-	nautilus? ( >=gnome-base/nautilus-3.28.0 <gnome-base/nautilus-42.20 )
+	introspection? ( >=dev-libs/gobject-introspection-1.82.0-r2:= )
 	postscript? ( >=app-text/libspectre-0.2:= )
 	spell? ( >=app-text/gspell-1.6.0:= )
 	tiff? ( >=media-libs/tiff-4.0:= )
@@ -50,10 +49,6 @@ DEPEND="
 RDEPEND="${DEPEND}
 	gnome? ( gnome-base/gvfs )
 	gnome-base/librsvg
-	|| (
-		>=x11-themes/adwaita-icon-theme-2.17.1
-		>=x11-themes/hicolor-icon-theme-0.10
-	)
 "
 BDEPEND="
 	gtk-doc? (
@@ -61,7 +56,7 @@ BDEPEND="
 		app-text/docbook-xml-dtd:4.3
 	)
 	dev-libs/appstream-glib
-	dev-util/gdbus-codegen
+	>=dev-util/gdbus-codegen-2.80.5-r1
 	dev-util/glib-utils
 	dev-util/itstool
 	>=sys-devel/gettext-0.19.8
@@ -71,13 +66,12 @@ BDEPEND="
 src_prepare() {
 	default
 	xdg_environment_reset
-
-	# Do not depend on adwaita-icon-theme, bug #326855, #391859
-	# https://gitlab.freedesktop.org/xdg/default-icon-theme/issues/7
-	sed -i '/adwaita_icon_theme_dep/d' meson.build shell/meson.build || die
 }
 
 src_configure() {
+	use X || append-cppflags -DGENTOO_GTK_HIDE_X11
+	use wayland || append-cppflags -DGENTOO_GTK_HIDE_WAYLAND
+
 	local emesonargs=(
 		-Ddevelopment=false
 		-Dplatform=gnome
@@ -85,7 +79,7 @@ src_configure() {
 		-Dviewer=true
 		-Dpreviewer=true
 		-Dthumbnailer=true
-		$(meson_use nautilus)
+		-Dnautilus=false
 
 		-Dcomics=enabled
 		$(meson_feature djvu)
@@ -116,8 +110,8 @@ src_install() {
 	meson_src_install
 
 	if use gtk-doc; then
-	   mkdir -p "${ED}"/usr/share/gtk-doc/html/ || die
-	   mv "${ED}"/usr/share/doc/{libevdocument,libevview} "${ED}"/usr/share/gtk-doc/html/ || die
+		mkdir -p "${ED}"/usr/share/gtk-doc/html/ || die
+		mv "${ED}"/usr/share/doc/{libevdocument,libevview} "${ED}"/usr/share/gtk-doc/html/ || die
 	fi
 }
 
